@@ -1,0 +1,31 @@
+server:
+  port: 8081
+  context-path: /
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size : 500MB
+
+elasticsearch:
+  host: localhost
+  port: 9200
+  protocol: http
+  rest:
+    connection-timeout: 3600000
+
+jwt:
+  header: Authorization
+
+  # (초)
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          elasticsearch: DEBUG
+
+cors:
+  url: http://localhost:3000

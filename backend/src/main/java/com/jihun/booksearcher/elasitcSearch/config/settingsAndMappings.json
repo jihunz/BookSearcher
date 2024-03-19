@@ -1,0 +1,88 @@
+{
+	"settings": {
+		"number_of_shards": 1,
+		"number_of_replicas": 2,
+		"analysis": {
+			"tokenizer": {
+				"nori_none": {
+					"type": "nori_tokenizer",
+					"decompound_mode": "none"
+				}
+			},
+			"analyzer": {
+				"custom_nori": {
+					"type": "custom",
+					"tokenizer": "nori_none",
+					"filter": [
+						"nori_readingform",
+						"korean_pos"
+					]
+				},
+				"author_nori": {
+					"type": "custom",
+					"tokenizer": "nori_none",
+					"filter": [
+						"nori_readingform",
+						"korean_pos",
+						"author_stop_words"
+					]
+				}
+
+			},
+			"filter": {
+				"korean_pos": {
+					"type": "nori_part_of_speech",
+					"stoptags": [
+						"NNB", "NR", "VA", "VX", "VCP", "VCN", "MM", "MAG", "MAJ", "IC", "J", "E", "XPN", "XSN", "XSV", "XSA", "SY", "NR", "SL", "SN"
+					]
+				},
+				"author_stop_words": {
+					"type": "stop",
+					"stopwords": ["(지은이)", "[편]", "저", "역", "지음", "옮김", "글", "사진", "엮음", "지은이", "옮긴이", "저자", "개발", "공저", "[지음]", "그림", "편", "필자", "집필", "기획", "및", "편저", "원작", "글쓴이", "집필위원", "(옮긴이)", "(해설)", "(그림)", "감수", "(감수)", "역자", "공역", "[등]", "편집", "기록", "번역", "[공]"]
+				}
+			}
+		},
+		"index": {
+			"refresh_interval": "1s"
+		}
+	},
+	"mappings": {
+		"properties": {
+			"id": {
+				"type": "long"
+			},
+			"isbn": {
+				"type": "long"
+			},
+			"title": {
+				"type": "text",
+				"analyzer": "custom_nori"
+			},
+			"author": {
+				"type": "text",
+				"analyzer": "author_nori",
+				"copy_to": ["subInfoText"]
+			},
+			"publisher": {
+				"type": "text",
+				"analyzer": "custom_nori",
+				"copy_to": ["subInfoText"]
+			},
+			"img": {
+				"type": "text"
+			},
+			"description": {
+				"type": "text",
+				"analyzer": "custom_nori"
+			},
+			"kdc": {
+				"type": "long"
+			},
+			"subInfoText": {
+				"type": "text",
+				"analyzer": "custom_nori"
+			}
+		}
+	}
+}
+  
