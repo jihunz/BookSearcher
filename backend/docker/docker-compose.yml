@@ -8,13 +8,15 @@ volumes:
     driver: local
   es02:
     driver: local
+  es03:
+    driver: local
   kibana:
     driver: local
 
-#networks:
-#  elastic:
-#    driver: bridge
-#    external: false
+networks:
+  default:
+    name: elastic
+    external: false
 
 
 services:
@@ -53,6 +55,12 @@ services:
           "      - localhost\n"\
           "    ip:\n"\
           "      - 127.0.0.1\n"\
+          "  - name: es03\n"\
+          "    dns:\n"\
+          "      - es03\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
           "  - name: kibana\n"\
           "    dns:\n"\
           "      - kibana\n"\
@@ -74,7 +82,7 @@ services:
         echo "All done!";
       '
     healthcheck:
-      test: [ "CMD-SHELL", "[ -f config/certs/es01/es01.crt ]" ]
+      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
       interval: 1s
       timeout: 5s
       retries: 120
@@ -85,24 +93,17 @@ services:
       setup:
         condition: service_healthy
     image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-#    labels:
-#      co.elastic.logs/module: elasticsearch
+    labels:
+      co.elastic.logs/module: elasticsearch
     volumes:
       - certs:/usr/share/elasticsearch/config/certs
       - es01:/usr/share/elasticsearch/data
     ports:
-      - ${ES01_PORT}:${ES01_PORT}
+      - ${ES_PORT}:9200
     environment:
       - node.name=es01
       - cluster.name=${CLUSTER_NAME}
-      - cluster.initial_master_nodes=es01,es02
-      - discovery.seed_hosts=es01,es02
-      - node.master=true
-      - node.date=true
-      - network.host=0.0.0.0
-      - http.port=${ES01_PORT}
-      - transport.tcp.port=9300
-      - discovery.zen.minimum_master_nodes=1
+      - discovery.type=multi-nodes
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - bootstrap.memory_lock=true
       - xpack.security.enabled=true
@@ -121,8 +122,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-#    networks:
-#      - elastic
     healthcheck:
       test:
         [
@@ -132,69 +131,3 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-
-  es02:
-    container_name: es02
-    depends_on:
-      - setup
-#      - es01
-    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
-    volumes:
-      - certs:/usr/share/elasticsearch/config/certs
-      - es02:/usr/share/elasticsearch/data
-    ports:
-      - ${ES02_PORT}:${ES02_PORT}
-    environment:
-      - node.name=es02
-      - cluster.name=${CLUSTER_NAME}
-      - discovery.seed_hosts=es01,es02
-      - cluster.initial_master_nodes=es01,es02
-      - node.master=true
-      - node.date=true
-      - network.host=0.0.0.0
-      - http.port=${ES02_PORT}
-      - transport.tcp.port=9300
-      - discovery.zen.minimum_master_nodes=1
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - bootstrap.memory_lock=true
-      - xpack.security.http.ssl.enabled=true
-      - xpack.security.http.ssl.key=certs/es02/es02.key
-      - xpack.security.http.ssl.certificate=certs/es02/es02.crt
-      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
-      - xpack.security.transport.ssl.enabled=true
-      - xpack.security.transport.ssl.key=certs/es02/es02.key
-      - xpack.security.transport.ssl.certificate=certs/es02/es02.crt
-      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-#    networks:
-#      - elastic
-
-  kibana:
-    container_name: kibana
-    depends_on:
-      - setup
-      - es01
-      - es02
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
-    volumes:
-      - certs:/usr/share/kibana/config/certs
-    ports:
-      - "${KIBANA_PORT}:${KIBANA_PORT}"
-    environment:
-      - SERVER_NAME=kibana
-      - ELASTICSEARCH_URL=https://
-      - ELASTICSEARCH_URL=https://es01:9200
-      - ELASTICSEARCH_HOSTS=https://es01:9200
-      - ELASTICSEARCH_USERNAME=admin
-      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
-      - XPACK_SECURITY_ENABLED=true
-      - XPACK_SECURITY_ENCRYPTIONKEY=${ENCRYPTION_KEY}
-      - XPACK_SECURITY_HTTP_SSL_ENABLED=true
-      - XPACK_SECURITY_HTTP_SSL_KEY=certs/kibana/kibana.key
-      - XPACK_SECURITY_HTTP_SSL_CERTIFICATE=certs/kibana/kibana.crt
-      - XPACK_SECURITY_HTTP_SSL_CERTIFICATEAUTHORITIES=certs/ca/ca.crt
-#    networks:
-#      - elastic
