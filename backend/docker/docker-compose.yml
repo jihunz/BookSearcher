@@ -85,6 +85,7 @@ services:
 #      elastic, kibana 기본 포트 변경하면 안됨
       - ${ES01_PORT}:9200
     environment:
+#      포트 변경을 원하면 이곳에 적절한 Es 설정 작성 -> 9200값 모두 ${ES01_PORT}로 변경 -> 설정이 없기 때문에 기본 port에서 실행
       - node.name=es01
       - cluster.name=${CLUSTER_NAME}
       - discovery.type=single-node
@@ -133,7 +134,8 @@ services:
       - ${KIBANA_PORT}:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=https://es01:${ES01_PORT}
+#      게이트웨이가 아닌 ip로 직접 요청 -> es 기본 포트를 명시해줘야함 -> es port 설정 변경 시 ${ES01_PORT}로 변경
+      - ELASTICSEARCH_HOSTS=https://es01:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
