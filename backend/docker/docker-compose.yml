@@ -177,10 +177,8 @@ services:
   kibana:
     container_name: kibana
     depends_on:
-      es01:
-        condition: service_healthy
-      es02:
-        condition: service_healthy
+      - es01
+      - es02
     image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     labels:
       co.elastic.logs/module: kibana
