@@ -208,3 +208,15 @@ services:
       timeout: 10s
       retries: 120
     restart: always
+
+  nginx:
+    container_name: booksearcher-nginx
+    depends_on:
+      - es01
+      - es02
+    build:
+      dockerfile: Dockerfile
+      context: ../nginx
+    ports:
+      - "3333:80"
+    restart: always
