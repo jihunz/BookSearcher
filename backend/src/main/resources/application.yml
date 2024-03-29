@@ -9,23 +9,10 @@ spring:
       max-request-size : 500MB
 
 elasticsearch:
-  ip: localhost
+  host: localhost
   port: 9200
   protocol: http
   rest:
     connection-timeout: 3600000
-
-jwt:
-  header: Authorization
-
-  # (초)
-
-logging:
-  level:
-    org:
-      springframework:
-        data:
-          elasticsearch: DEBUG
-
-cors:
-  url: http://115.95.23.27:1234
+  apikey: UXlsRmlvNEJpT0VwcmRBVEhtcjU6d2htQ25nYnhSSC1FRmROUFhidmNDdw==
+  url: https://localhost:3333/es

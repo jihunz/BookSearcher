@@ -209,8 +209,8 @@ services:
       retries: 120
     restart: always
 
-  nginx:
-    container_name: booksearcher-nginx
+  es-nginx:
+    container_name: es-nginx
     depends_on:
       - es01
       - es02
