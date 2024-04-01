@@ -10,9 +10,8 @@ spring:
 
 elasticsearch:
   host: localhost
-  port: 9200
+  port: 3333
   protocol: http
-  rest:
-    connection-timeout: 3600000
-  apikey: UXlsRmlvNEJpT0VwcmRBVEhtcjU6d2htQ25nYnhSSC1FRmROUFhidmNDdw==
-  url: https://localhost:3333/es
+#  rest:
+#    connection-timeout: 3600000
+  apikey: cy1UcW1ZNEJyM2lCZUFaM2l6alQ6b3hWTnZWYmpSdUc1QnB1LXhIaklRUQ==

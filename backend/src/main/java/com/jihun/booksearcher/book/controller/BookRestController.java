@@ -19,7 +19,7 @@ public class BookRestController {
 	private final BookServiceV2 bookServiceV2;
 
 
-	@PostMapping("/indexing")
+	@PostMapping("/upload")
 	public ResponseEntity<?> upload() throws IOException {
 		bookServiceV2.upload();
 
