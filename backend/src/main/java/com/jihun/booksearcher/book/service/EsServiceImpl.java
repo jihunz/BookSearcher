@@ -2,6 +2,7 @@ package com.jihun.booksearcher.book.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.IndexResponse;
+import co.elastic.clients.elasticsearch.indices.CreateIndexResponse;
 import com.jihun.booksearcher.book.model.Product;
 import com.jihun.booksearcher.elasitcSearch.EsConfigV2;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ public class EsServiceImpl {
                 .document(product)
         );
 
-        return res;
+        System.out.println(res);
+
+        return null;
     }
 }
