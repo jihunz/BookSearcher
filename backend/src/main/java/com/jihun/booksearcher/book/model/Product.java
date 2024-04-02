@@ -2,6 +2,7 @@ package com.jihun.booksearcher.book.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
