@@ -16,8 +16,6 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Base64;
-
 @Configuration
 @RequiredArgsConstructor
 public class EsConfigV2 {
@@ -35,13 +33,18 @@ public class EsConfigV2 {
     @Value("${elasticsearch.apikey}")
     private String apikey;
 
+    @Value("${elasticsearch.userName}")
+    private String userName;
+
+    @Value("${elasticsearch.password}")
+    private String password;
+
     // 스프링이 이 Bean을 생성할 때 한 번만 호출되는 메서드
     @Bean
     public ElasticsearchClient elasticsearchClient() {
         if (elasticsearchClient == null) {
             BasicCredentialsProvider credsProv = new BasicCredentialsProvider();
-            credsProv.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("elastic", "12341234"));
-
+            credsProv.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
 
             RestClient restClient = RestClient.builder(new HttpHost(host, port, protocol))
                     .setDefaultHeaders(new Header[]{new BasicHeader("Authorization", "ApiKey " + apikey)})
@@ -49,6 +52,7 @@ public class EsConfigV2 {
                             .setDefaultCredentialsProvider(credsProv))
                     .build();
             ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+
             elasticsearchClient = new ElasticsearchClient(transport);
         }
         return elasticsearchClient;

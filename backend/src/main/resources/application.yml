@@ -15,3 +15,5 @@ elasticsearch:
 #  rest:
 #    connection-timeout: 3600000
   apikey: cy1UcW1ZNEJyM2lCZUFaM2l6alQ6b3hWTnZWYmpSdUc1QnB1LXhIaklRUQ==
+  userName: elastic
+  password: 12341234
