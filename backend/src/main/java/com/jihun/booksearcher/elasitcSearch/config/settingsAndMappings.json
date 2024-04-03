@@ -76,7 +76,7 @@
 				"analyzer": "custom_nori"
 			},
 			"kdc": {
-				"type": "long"
+				"type": "double"
 			},
 			"subInfoText": {
 				"type": "text",

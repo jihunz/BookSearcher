@@ -21,7 +21,7 @@ public class BookRestController {
 
 	@PostMapping("/upload")
 	public ResponseEntity<?> upload() throws IOException {
-		bookServiceV2.upload();
+		bookServiceV2.upload(null);
 
 		return ResponseEntity.ok(null);
 	}

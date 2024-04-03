@@ -29,7 +29,6 @@ public class EsServiceImpl {
             list.add(new Product(i , "product" + i, 1000 * i));
         }
 
-
         BulkRequest.Builder br = new BulkRequest.Builder();
 
         for (Product item : list) {
