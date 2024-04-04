@@ -3,7 +3,7 @@
 //import co.elastic.clients.elasticsearch.ElasticsearchClient;
 //import com.jihun.booksearcher.book.model.Book;
 //import com.jihun.booksearcher.elasitcSearch.EsClient;
-//import com.jihun.booksearcher.elasitcSearch.EsConfig;
+//import com.jihun.booksearcher.elasitcSearch.config.EsConfig;
 //import com.jihun.booksearcher.elasitcSearch.dao.Indexing;
 //import com.jihun.booksearcher.elasitcSearch.model.IndexVo;
 //import com.jihun.booksearcher.utils.BookCsvUploader;

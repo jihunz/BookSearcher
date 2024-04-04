@@ -2,6 +2,7 @@ package com.jihun.booksearcher.book.service;
 
 
 import com.jihun.booksearcher.book.model.BookV2;
+import com.jihun.booksearcher.elasitcSearch.service.EsServiceImpl;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +13,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -30,6 +34,8 @@ public class BookServiceV2Impl implements BookServiceV2 {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
 
+        Map<String, Integer> fileMap = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), k -> 0));
+
         if (files != null) {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
 
@@ -38,16 +44,21 @@ public class BookServiceV2Impl implements BookServiceV2 {
                     executorService.submit(() -> {
                         try {
                             log.info("[thread]: new thread created");
-                            this.upload(file);
-
-//                            indexing.bulkIndexing("book", fileData);
+                            List<BookV2> list = this.upload(file);
+                            esService.index(list);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
                         } finally {
+                            fileMap.replace(file.getName(), 1);
                             log.info("[thread]: completed");
                         }
                     });
                 }
             }
 
+            for (Map.Entry<String, Integer> item : fileMap.entrySet()) {
+                System.out.println(item.getKey() + ":" + item.getValue());
+            }
             executorService.shutdown();
             // 모든 작업이 완료될 때까지 대기
         }

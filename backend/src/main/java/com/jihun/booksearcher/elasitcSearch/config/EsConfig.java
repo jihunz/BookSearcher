@@ -1,4 +1,4 @@
-package com.jihun.booksearcher.elasitcSearch;
+package com.jihun.booksearcher.elasitcSearch.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
-public class EsConfigV2 {
+public class EsConfig {
     private ElasticsearchClient elasticsearchClient;
 
     @Value("${elasticsearch.host}")

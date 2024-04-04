@@ -1,6 +1,6 @@
 //package com.jihun.booksearcher.elasitcSearch.dao;
 //
-//import com.jihun.booksearcher.elasitcSearch.EsConfig;
+//import com.jihun.booksearcher.elasitcSearch.config.EsConfig;
 //import com.jihun.booksearcher.elasitcSearch.IndexEnum;
 //import lombok.RequiredArgsConstructor;
 //import lombok.extern.log4j.Log4j2;
