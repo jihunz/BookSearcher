@@ -4,12 +4,10 @@ import com.jihun.booksearcher.book.service.BookServiceV2;
 import com.jihun.booksearcher.elasitcSearch.model.IndexVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/book")
@@ -20,8 +18,8 @@ public class BookRestController {
 
 
 	@PostMapping("/upload")
-	public ResponseEntity<?> upload() throws IOException {
-		bookServiceV2.upload(null);
+	public ResponseEntity<?> upload(@RequestBody Map<String, String> body) throws IOException {
+		bookServiceV2.uploadByFolder(body.get("dirPath"));
 
 		return ResponseEntity.ok(null);
 	}

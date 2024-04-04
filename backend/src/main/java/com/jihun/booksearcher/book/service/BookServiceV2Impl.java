@@ -2,92 +2,116 @@ package com.jihun.booksearcher.book.service;
 
 
 import com.jihun.booksearcher.book.model.BookV2;
-import com.jihun.booksearcher.book.util.csv.CustomMappingStrategy;
-import com.opencsv.bean.CsvToBeanBuilder;
-import com.opencsv.bean.CsvToBeanFilter;
-import com.opencsv.bean.MappingStrategy;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class BookServiceV2Impl implements BookServiceV2 {
     private final EsServiceImpl esService;
+    private long id = 1;
 
 
     @Override
     public String uploadByFolder(String dirPath) throws IOException {
-//        File folder = new File(dirPath);
-//        File[] files = folder.listFiles();
-//
-//        if (files != null) {
-//            ExecutorService executorService = Executors.newFixedThreadPool(10);
-//
-//            for (File file : files) {
-//                if (file.isFile() && file.getName().endsWith(".csv")) {
-//                    executorService.submit(() -> {
-//                        try {
-//                            log.info("[thread]: new thread created");
-//                            List<Map<String, Object>> fileData = BookCsvUploader.ReadCsvFile(this.convert2MultipartFile(file));
+        File folder = new File(dirPath);
+        File[] files = folder.listFiles();
+
+        if (files != null) {
+            ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+            for (File file : files) {
+                if (file.isFile() && file.getName().endsWith(".csv")) {
+                    executorService.submit(() -> {
+                        try {
+                            log.info("[thread]: new thread created");
+                            this.upload(file);
+
 //                            indexing.bulkIndexing("book", fileData);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        } finally {
-//                            log.info("[thread]: completed");
-//                        }
-//                    });
-//                }
-//            }
-//
-//            executorService.shutdown();
-//            // 모든 작업이 완료될 때까지 대기
-//        }
-//        String msg = "[thread]: upload completed";
-//        log.info(msg);
-//        return msg;
-        return null;
+                        } finally {
+                            log.info("[thread]: completed");
+                        }
+                    });
+                }
+            }
+
+            executorService.shutdown();
+            // 모든 작업이 완료될 때까지 대기
+        }
+        String msg = "[thread]: upload completed";
+        log.info(msg);
+        return msg;
     }
 
     @Override
-    public List<BookV2> upload(String csvFilePath) {
-        try {
-            String path = "/Users/jihunjang/Desktop/DJU/3학년/2인 프로젝트/도서 데이터/test/NL_BO_SPECIES_MASTER_NEW_202105.csv";
-            log.info("[OpenCsv]: Reading CSV file: {}", path);
+    public List<BookV2> upload(File file) {
+        List<BookV2> list = new ArrayList<>();
 
+        try (CSVReader reader = new CSVReader(new FileReader(file))) {
+            reader.skip(1);
 
-            //TODO: 설명이 비어있으면 해당 행 매핑 제외 코드 추가
-            CustomMappingStrategy strategy;
-            List<BookV2> list = new CsvToBeanBuilder(new FileReader(path))
-                    .withType(BookV2.class)
-                    .withMappingStrategy(strategy)
-                    .withFilter(strings -> {
-                        for (String one : strings) {
-                            if (one != null && one.length() > 0) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    })
-                    .build()
-                    .parse();
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                if (isEmptyRow(nextLine) || isEmptyColumn(nextLine, 10) || !isKorean(nextLine)) {
+                    continue;
+                }
 
-            for (BookV2 bookV2 : list) {
-                System.out.println(bookV2.toString());
+                BookV2 book = new BookV2();
+                book.setId(id++);
+                book.setIsbn(nextLine[1]); // ISBN 열
+                book.setTitle(nextLine[3]); // 제목 열
+                book.setAuthor(nextLine[4]); // 저자 열
+                book.setPublisher(nextLine[5]); // 출판사 열
+                book.setImg(nextLine[9]); // 이미지 URL 열
+                book.setDescription(nextLine[10]); // 책 소개 열
+                book.setKdc(!nextLine[11].isEmpty() ? nextLine[11] : null); // KDC 열
+
+                list.add(book);
             }
 
-            log.info("[OpenCsv]: Mapping objects from CSV file completed successfully.");
-            return null;
-        } catch (Exception e) {
-            log.error("[OpenCsv]: Error occurred while reading CSV file and mapping objects: {}", e.getMessage());
-            return null;
+        } catch (IOException | CsvException e) {
+            e.printStackTrace();
         }
+
+        for (BookV2 item : list) {
+            System.out.println(item);
+        }
+        return list;
     }
 
+    // 특정 행이 비어 있는지 확인하는 메서드
+    private static boolean isEmptyRow(String[] row) {
+        for (String cell : row) {
+            if (!cell.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 특정 열이 비어 있는지 확인하는 메서드
+    private static boolean isEmptyColumn(String[] row, int columnIndex) {
+        return row.length <= columnIndex || row[columnIndex].isEmpty();
+    }
+
+    private static boolean isKorean(String[] row) {
+        String pattern = ".*[ㄱ-ㅎ가-힣]+.*"; // 한글을 포함하는 정규 표현식
+        boolean title = Pattern.matches(pattern, row[3]);
+        boolean desc = Pattern.matches(pattern, row[10]);
+
+        return title && desc;
+    }
 }

@@ -52,7 +52,7 @@
 				"type": "long"
 			},
 			"isbn": {
-				"type": "long"
+				"type": "text"
 			},
 			"title": {
 				"type": "text",
@@ -76,7 +76,7 @@
 				"analyzer": "custom_nori"
 			},
 			"kdc": {
-				"type": "double"
+				"type": "text"
 			},
 			"subInfoText": {
 				"type": "text",
