@@ -3,7 +3,6 @@ package com.jihun.booksearcher.elasitcSearch.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
-import co.elastic.clients.elasticsearch.core.IndexResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import com.jihun.booksearcher.book.model.BookV2;
 import com.jihun.booksearcher.elasitcSearch.config.EsConfig;
@@ -19,7 +18,7 @@ import java.util.List;
 public class EsServiceImpl {
     private final EsConfig esConfig;
 
-    public IndexResponse index(List<BookV2> list) throws IOException {
+    public BulkResponse index(List<BookV2> list) throws IOException {
         ElasticsearchClient esClient = esConfig.elasticsearchClient();
 
         BulkRequest.Builder br = new BulkRequest.Builder();
@@ -45,6 +44,6 @@ public class EsServiceImpl {
             }
         }
 
-        return null;
+        return result;
     }
 }

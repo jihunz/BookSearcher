@@ -1,6 +1,8 @@
 package com.jihun.booksearcher.book.service;
 
 
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import com.jihun.booksearcher.book.dto.UploadStatus;
 import com.jihun.booksearcher.book.model.BookV2;
 import com.jihun.booksearcher.elasitcSearch.service.EsServiceImpl;
 import com.opencsv.CSVReader;
@@ -17,7 +19,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -25,16 +26,15 @@ import java.util.stream.Collectors;
 public class BookServiceV2Impl implements BookServiceV2 {
     private final EsServiceImpl esService;
     private long id = 1;
-    private long cnt = 0;
-    private Map<String, Integer> fileMap;
+    private final UploadStatus uploadStatus;
 
 
     @Override
-    public String uploadByFolder(String dirPath) throws IOException {
+    public UploadStatus uploadByFolder(String dirPath) throws IOException {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
 
-        fileMap = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), k -> 0));
+        uploadStatus.setFileInfo(files);
 
         if (files != null) {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -46,12 +46,13 @@ public class BookServiceV2Impl implements BookServiceV2 {
                     executorService.submit(() -> {
                         try {
                             log.info("[thread]: new thread created");
-                            List<BookV2> list = this.upload(file);
-                            esService.index(list);
+                            BulkResponse res = esService.index(this.convert2List(file));
+                            uploadStatus.setUploadedBooks(uploadStatus.getUploadedBooks() + Long.valueOf(res.items().size()));
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         } finally {
-                            fileMap.replace(file.getName(), 1);
+                            uploadStatus.getUploadStat().replace(file.getName(), true);
                             log.info("[thread]: completed");
                             latch.countDown(); // 작업 완료 시 CountDownLatch 카운트 감소
                         }
@@ -69,30 +70,13 @@ public class BookServiceV2Impl implements BookServiceV2 {
             executorService.shutdown();
         }
 
-        log.info("[file upload status]: ");
-        for (Map.Entry<String, Integer> item : fileMap.entrySet()) {
-            log.info(item.getKey() + ":" + item.getValue());
-        }
-
-        String msg = "[thread]: upload completed";
-        log.info(msg);
-        log.info("[number of books]: " + String.valueOf(cnt));
-
-        return msg;
+        log.info("[thread]: upload completed");
+        uploadStatus.log();
+        return uploadStatus;
     }
-
-    private Map<String, String> logStat() {
-
-        //1. 파일 개수, 2. 파일별 업로드 결과, 3. 한글 도서 개수, 4. 업로드한 한글 도서 개수
-        Map<String, String> result = new HashMap<>()
-
-                ;
-        return result;
-    }
-
 
     @Override
-    public List<BookV2> upload(File file) {
+    public List<BookV2> convert2List(File file) {
         List<BookV2> list = new ArrayList<>();
 
         try (CSVReader reader = new CSVReader(new FileReader(file))) {
@@ -113,10 +97,10 @@ public class BookServiceV2Impl implements BookServiceV2 {
                 book.setImg(nextLine[9]); // 이미지 URL 열
                 book.setDescription(nextLine[10]); // 책 소개 열
                 book.setKdc(!nextLine[11].isEmpty() ? nextLine[11] : null); // KDC 열
-
                 list.add(book);
 
-                this.cnt++;
+                long numOfBooks = uploadStatus.getNumOfBooks();
+                uploadStatus.setNumOfBooks(numOfBooks + 1);
             }
 
         } catch (IOException | CsvException e) {

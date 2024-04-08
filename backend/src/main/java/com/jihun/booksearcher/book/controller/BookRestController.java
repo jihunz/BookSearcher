@@ -17,9 +17,7 @@ public class BookRestController {
 
 	@PostMapping("/upload")
 	public ResponseEntity<?> upload(@RequestBody Map<String, String> body) throws IOException {
-		bookServiceV2.uploadByFolder(body.get("dirPath"));
-
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok(bookServiceV2.uploadByFolder(body.get("dirPath")));
 	}
 
 //	@GetMapping("/search")

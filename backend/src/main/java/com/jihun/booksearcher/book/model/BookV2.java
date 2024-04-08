@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BookV2 {
-    private long id;
+    private long  id;
     @CsvBindByName(column = "ISBN_THIRTEEN_NO")
     private String isbn;
     @CsvBindByName(column = "TITLE_NM")
