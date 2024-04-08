@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -27,6 +25,8 @@ import java.util.stream.Collectors;
 public class BookServiceV2Impl implements BookServiceV2 {
     private final EsServiceImpl esService;
     private long id = 1;
+    private long cnt = 0;
+    private Map<String, Integer> fileMap;
 
 
     @Override
@@ -34,10 +34,12 @@ public class BookServiceV2Impl implements BookServiceV2 {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
 
-        Map<String, Integer> fileMap = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), k -> 0));
+        fileMap = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), k -> 0));
 
         if (files != null) {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+            CountDownLatch latch = new CountDownLatch(files.length);
 
             for (File file : files) {
                 if (file.isFile() && file.getName().endsWith(".csv")) {
@@ -51,21 +53,43 @@ public class BookServiceV2Impl implements BookServiceV2 {
                         } finally {
                             fileMap.replace(file.getName(), 1);
                             log.info("[thread]: completed");
+                            latch.countDown(); // 작업 완료 시 CountDownLatch 카운트 감소
                         }
                     });
                 }
             }
 
-            for (Map.Entry<String, Integer> item : fileMap.entrySet()) {
-                System.out.println(item.getKey() + ":" + item.getValue());
+            try {
+                latch.await(); // 모든 스레드가 작업을 완료할 때까지 대기
+            } catch (InterruptedException e) {
+                log.error("Thread interrupted while waiting for tasks to complete.", e);
+                Thread.currentThread().interrupt(); // 인터럽트 상태 재설정
             }
+
             executorService.shutdown();
-            // 모든 작업이 완료될 때까지 대기
         }
+
+        log.info("[file upload status]: ");
+        for (Map.Entry<String, Integer> item : fileMap.entrySet()) {
+            log.info(item.getKey() + ":" + item.getValue());
+        }
+
         String msg = "[thread]: upload completed";
         log.info(msg);
+        log.info("[number of books]: " + String.valueOf(cnt));
+
         return msg;
     }
+
+    private Map<String, String> logStat() {
+
+        //1. 파일 개수, 2. 파일별 업로드 결과, 3. 한글 도서 개수, 4. 업로드한 한글 도서 개수
+        Map<String, String> result = new HashMap<>()
+
+                ;
+        return result;
+    }
+
 
     @Override
     public List<BookV2> upload(File file) {
@@ -91,15 +115,14 @@ public class BookServiceV2Impl implements BookServiceV2 {
                 book.setKdc(!nextLine[11].isEmpty() ? nextLine[11] : null); // KDC 열
 
                 list.add(book);
+
+                this.cnt++;
             }
 
         } catch (IOException | CsvException e) {
             e.printStackTrace();
         }
 
-        for (BookV2 item : list) {
-            System.out.println(item);
-        }
         return list;
     }
 
