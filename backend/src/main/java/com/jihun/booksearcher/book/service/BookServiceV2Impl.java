@@ -37,7 +37,7 @@ public class BookServiceV2Impl implements BookServiceV2 {
         uploadStatus.initFileInfo(files);
 
         if (files != null) {
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
+            ExecutorService executorService = Executors.newFixedThreadPool(5);
 
             CountDownLatch latch = new CountDownLatch(files.length);
 
@@ -49,6 +49,7 @@ public class BookServiceV2Impl implements BookServiceV2 {
                             log.info("[thread]: {} thread created", name);
                             List<BookV2> list = this.convert2List(file);
                             //TODO: 전체 데이터가 업로드되지 않음 ->  5000개씩 bulk indexing 분할?
+                            //TODO: nginx body size, buffer size 5G로 샹향?
                             BulkResponse res = esService.index(list);
 
                             int uploadCnt = res.items().size();
