@@ -37,27 +37,28 @@ public class BookServiceV2Impl implements BookServiceV2 {
         uploadStatus.initFileInfo(files);
 
         if (files != null) {
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
+            ExecutorService executorService = Executors.newFixedThreadPool(5);
 
             CountDownLatch latch = new CountDownLatch(files.length);
 
             for (File file : files) {
-                if (file.isFile() && file.getName().endsWith(".csv")) {
+                String name = file.getName();
+                if (file.isFile() && name.endsWith(".csv")) {
                     executorService.submit(() -> {
                         try {
-                            log.info("[thread]: new thread created");
+                            log.info("[thread]: {} thread created", name);
                             List<BookV2> list = this.convert2List(file);
                             BulkResponse res = esService.index(list);
 
                             int uploadCnt = res.items().size();
                             uploadStatus.setUploadedBooks(uploadStatus.getUploadedBooks() + Long.valueOf(uploadCnt));
                             String msg = uploadStatus.getUploadedRatio(list.size(), uploadCnt);
-                            uploadStatus.getUploadStat().put(file.getName(), msg);
+                            uploadStatus.getUploadResult().put(name, msg);
                             uploadStatus.logEach(msg);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         } finally {
-                            log.info("[thread]: completed");
+                            log.info("[thread]: {} completed", name);
                             latch.countDown(); // 작업 완료 시 CountDownLatch 카운트 감소
                         }
                     });
@@ -101,7 +102,6 @@ public class BookServiceV2Impl implements BookServiceV2 {
                 book.setDescription(nextLine[10]); // 책 소개 열
                 book.setKdc(!nextLine[11].isEmpty() ? nextLine[11] : null); // KDC 열
                 list.add(book);
-
             }
 
         } catch (IOException | CsvException e) {

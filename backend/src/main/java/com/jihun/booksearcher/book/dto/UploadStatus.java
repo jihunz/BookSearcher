@@ -12,16 +12,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @Data
 @NoArgsConstructor
-@Component
+@Component 
 public class UploadStatus {
     private int numOfFile = 0;
-    private Map<String, String> uploadStat;
+    private Map<String, String> uploadResult;
     private long numOfBooks = 0;
     private long uploadedBooks = 0;
 
     public void initFileInfo(File[] files) {
         this.numOfFile = files.length;
-        this.uploadStat = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), v -> "0"));
+        this.uploadResult = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), v -> "0"));
     }
 
     public void logResult() {
@@ -35,7 +35,7 @@ public class UploadStatus {
     public String toString() {
         return "UploadStatus{" +
                 "numOfFile=" + numOfFile +
-                ", uploadStat=" + uploadStat +
+                ", uploadStat=" + uploadResult +
                 ", numOfBooks=" + numOfBooks +
                 ", uploadedBooks=" + uploadedBooks +
                 '}';
