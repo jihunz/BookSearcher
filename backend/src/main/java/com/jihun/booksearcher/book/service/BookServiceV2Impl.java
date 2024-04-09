@@ -34,7 +34,7 @@ public class BookServiceV2Impl implements BookServiceV2 {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
 
-        uploadStatus.setFileInfo(files);
+        uploadStatus.initFileInfo(files);
 
         if (files != null) {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -46,13 +46,17 @@ public class BookServiceV2Impl implements BookServiceV2 {
                     executorService.submit(() -> {
                         try {
                             log.info("[thread]: new thread created");
-                            BulkResponse res = esService.index(this.convert2List(file));
-                            uploadStatus.setUploadedBooks(uploadStatus.getUploadedBooks() + Long.valueOf(res.items().size()));
+                            List<BookV2> list = this.convert2List(file);
+                            BulkResponse res = esService.index(list);
 
+                            int uploadCnt = res.items().size();
+                            uploadStatus.setUploadedBooks(uploadStatus.getUploadedBooks() + Long.valueOf(uploadCnt));
+                            String msg = uploadStatus.getUploadedRatio(list.size(), uploadCnt);
+                            uploadStatus.getUploadStat().put(file.getName(), msg);
+                            uploadStatus.logEach(msg);
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         } finally {
-                            uploadStatus.getUploadStat().replace(file.getName(), true);
                             log.info("[thread]: completed");
                             latch.countDown(); // 작업 완료 시 CountDownLatch 카운트 감소
                         }
@@ -70,8 +74,7 @@ public class BookServiceV2Impl implements BookServiceV2 {
             executorService.shutdown();
         }
 
-        log.info("[thread]: upload completed");
-        uploadStatus.log();
+        uploadStatus.logResult();
         return uploadStatus;
     }
 
@@ -99,14 +102,13 @@ public class BookServiceV2Impl implements BookServiceV2 {
                 book.setKdc(!nextLine[11].isEmpty() ? nextLine[11] : null); // KDC 열
                 list.add(book);
 
-                long numOfBooks = uploadStatus.getNumOfBooks();
-                uploadStatus.setNumOfBooks(numOfBooks + 1);
             }
 
         } catch (IOException | CsvException e) {
             e.printStackTrace();
         }
 
+        uploadStatus.setNumOfBooks(uploadStatus.getNumOfBooks() + list.size());
         return list;
     }
 

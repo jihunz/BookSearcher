@@ -1,7 +1,5 @@
 package com.jihun.booksearcher.book.dto;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,17 +15,20 @@ import java.util.stream.Collectors;
 @Component
 public class UploadStatus {
     private int numOfFile = 0;
-    private Map<String, Boolean> uploadStat;
+    private Map<String, String> uploadStat;
     private long numOfBooks = 0;
     private long uploadedBooks = 0;
 
-    public void setFileInfo(File[] files) {
+    public void initFileInfo(File[] files) {
         this.numOfFile = files.length;
-        this.uploadStat = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), k -> false));
+        this.uploadStat = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), v -> "0"));
     }
 
-    public void log() {
-        log.info("UploadStatus: {}", this);
+    public void logResult() {
+        log.info("[thread-upload completed]: {}", this);
+    }
+    public void logEach(String msg) {
+        log.info("[rows / uploaded rows]: " + msg);
     }
 
     @Override
@@ -38,5 +39,8 @@ public class UploadStatus {
                 ", numOfBooks=" + numOfBooks +
                 ", uploadedBooks=" + uploadedBooks +
                 '}';
+    }
+    public String getUploadedRatio(int listSize, int resSize) {
+        return String.format("%d / %d = %.2f%%", listSize, resSize, (float) listSize / resSize * 100);
     }
 }
