@@ -18,7 +18,7 @@ import java.util.List;
 public class EsServiceImpl {
     private final EsConfig esConfig;
 
-    public BulkResponse index(List<BookV2> list) throws IOException {
+    public BulkResponse bulkIdx(List<BookV2> list) throws IOException {
         ElasticsearchClient esClient = esConfig.elasticsearchClient();
 
         BulkRequest.Builder br = new BulkRequest.Builder();

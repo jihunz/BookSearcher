@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -27,17 +29,19 @@ public class BookServiceV2Impl implements BookServiceV2 {
     private final EsServiceImpl esService;
     private long id = 1;
     private final UploadStatus uploadStatus;
+    private final int BULK_SIZE = 10000;
 
 
     @Override
     public UploadStatus uploadByFolder(String dirPath) throws IOException {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
+        LocalDateTime start = LocalDateTime.now();
 
         uploadStatus.initFileInfo(files);
 
         if (files != null) {
-            ExecutorService executorService = Executors.newFixedThreadPool(5);
+            ExecutorService executorService = Executors.newFixedThreadPool(10);
 
             CountDownLatch latch = new CountDownLatch(files.length);
 
@@ -46,17 +50,22 @@ public class BookServiceV2Impl implements BookServiceV2 {
                 if (file.isFile() && name.endsWith(".csv")) {
                     executorService.submit(() -> {
                         try {
+
                             log.info("[thread]: {} thread created", name);
                             List<BookV2> list = this.convert2List(file);
-                            //TODO: 전체 데이터가 업로드되지 않음 ->  5000개씩 bulk indexing 분할?
-                            //TODO: nginx body size, buffer size 5G로 샹향?
-                            BulkResponse res = esService.index(list);
 
-                            int uploadCnt = res.items().size();
-                            uploadStatus.setUploadedBooks(uploadStatus.getUploadedBooks() + Long.valueOf(uploadCnt));
-                            String msg = uploadStatus.getUploadedRatio(list.size(), uploadCnt);
-                            uploadStatus.getUploadResult().put(name, msg);
-                            uploadStatus.logEach(msg);
+                            for (int i = 0; i < list.size(); i += BULK_SIZE) {
+                                int endIdx = Math.min(i + BULK_SIZE, list.size());
+                                List<BookV2> chunkedList = list.subList(i, endIdx);
+                                BulkResponse res = esService.bulkIdx(chunkedList);
+
+                                 int uploadCnt = res.items().size();
+                                uploadStatus.setUploadedBooks(uploadStatus.getUploadedBooks() + Long.valueOf(uploadCnt));
+                                String msg = uploadStatus.getUploadedRatio(list.size(), uploadCnt);
+                                uploadStatus.getUploadResult().put(name, msg);
+                                uploadStatus.logEach(msg);
+                            }
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         } finally {
@@ -76,6 +85,8 @@ public class BookServiceV2Impl implements BookServiceV2 {
 
             executorService.shutdown();
         }
+
+        log.info(String.valueOf(Duration.between(LocalDateTime.now(), start)));
 
         uploadStatus.logResult();
         return uploadStatus;
