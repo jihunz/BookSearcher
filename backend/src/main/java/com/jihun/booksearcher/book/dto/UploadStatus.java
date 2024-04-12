@@ -1,11 +1,14 @@
 package com.jihun.booksearcher.book.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +21,8 @@ public class UploadStatus {
     private Map<String, String> uploadResult;
     private int numOfBooks = 0;
     private int uploadedBooks = 0;
+    @JsonIgnore
+    private LocalDateTime startTime;
 
     public void initFileInfo(File[] files) {
         this.numOfFile = files.length;
@@ -25,6 +30,7 @@ public class UploadStatus {
     }
 
     public void logResult() {
+        log.info(String.valueOf(Duration.between(LocalDateTime.now(), this.startTime)));
         log.info("[thread-upload completed]: {}", this);
     }
     public void logEach(String fileName, String msg) {
@@ -46,5 +52,9 @@ public class UploadStatus {
 
     public void setUploadedBooks(int num) {
         this.uploadedBooks += num;
+    }
+
+    public void initStartTime() {
+        this.startTime = LocalDateTime.now();
     }
 }

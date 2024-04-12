@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -36,8 +34,8 @@ public class BookServiceV2Impl implements BookServiceV2 {
     public UploadStatus uploadByFolder(String dirPath) throws IOException {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
-        LocalDateTime start = LocalDateTime.now();
 
+        uploadStatus.initStartTime();
         uploadStatus.initFileInfo(files);
 
         if (files != null) {
@@ -87,7 +85,6 @@ public class BookServiceV2Impl implements BookServiceV2 {
             executorService.shutdown();
         }
 
-        log.info(String.valueOf(Duration.between(LocalDateTime.now(), start)));
 
         uploadStatus.logResult();
         return uploadStatus;
