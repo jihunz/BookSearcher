@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
 public class UploadStatus {
     private int numOfFile = 0;
     private Map<String, String> uploadResult;
-    private long numOfBooks = 0;
-    private long uploadedBooks = 0;
+    private int numOfBooks = 0;
+    private int uploadedBooks = 0;
 
     public void initFileInfo(File[] files) {
         this.numOfFile = files.length;
@@ -27,8 +27,8 @@ public class UploadStatus {
     public void logResult() {
         log.info("[thread-upload completed]: {}", this);
     }
-    public void logEach(String msg) {
-        log.info("[rows / uploaded rows]: " + msg);
+    public void logEach(String fileName, String msg) {
+        log.info("[{}]: {}", fileName, msg);
     }
 
     @Override
@@ -41,6 +41,10 @@ public class UploadStatus {
                 '}';
     }
     public String getUploadedRatio(int listSize, int resSize) {
-        return String.format("%d / %d = %.2f%%", listSize, resSize, (float) listSize / resSize * 100);
+        return String.format("%d / %d = %.2f%%", listSize, resSize, (float) resSize / listSize * 100);
+    }
+
+    public void setUploadedBooks(int num) {
+        this.uploadedBooks += num;
     }
 }

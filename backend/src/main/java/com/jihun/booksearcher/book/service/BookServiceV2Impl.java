@@ -53,17 +53,18 @@ public class BookServiceV2Impl implements BookServiceV2 {
 
                             log.info("[thread]: {} thread created", name);
                             List<BookV2> list = this.convert2List(file);
+                            int eachUploadCnt = 0;
 
                             for (int i = 0; i < list.size(); i += BULK_SIZE) {
                                 int endIdx = Math.min(i + BULK_SIZE, list.size());
                                 List<BookV2> chunkedList = list.subList(i, endIdx);
                                 BulkResponse res = esService.bulkIdx(chunkedList);
 
-                                 int uploadCnt = res.items().size();
-                                uploadStatus.setUploadedBooks(uploadStatus.getUploadedBooks() + Long.valueOf(uploadCnt));
-                                String msg = uploadStatus.getUploadedRatio(list.size(), uploadCnt);
+                                eachUploadCnt += res.items().size();
+                                uploadStatus.setUploadedBooks(res.items().size());
+                                String msg = uploadStatus.getUploadedRatio(list.size(), eachUploadCnt);
                                 uploadStatus.getUploadResult().put(name, msg);
-                                uploadStatus.logEach(msg);
+                                uploadStatus.logEach(name, msg);
                             }
 
                         } catch (IOException e) {
