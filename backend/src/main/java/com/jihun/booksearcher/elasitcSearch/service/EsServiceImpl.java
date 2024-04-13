@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,7 +38,7 @@ public class EsServiceImpl {
 
         if (result.errors()) {
             log.error("[EsServiceImpl-index]: Bulk had errors");
-            for (BulkResponseItem item: result.items()) {
+            for (BulkResponseItem item : result.items()) {
                 if (item.error() != null) {
                     log.error(item.error().reason());
                 }
@@ -45,5 +46,10 @@ public class EsServiceImpl {
         }
 
         return result;
+    }
+
+    public void addMapping(List<BookV2> list) throws IOException {
+        ElasticsearchClient esClient = esConfig.elasticsearchClient();
+
     }
 }
