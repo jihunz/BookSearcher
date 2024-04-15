@@ -85,7 +85,6 @@ public class BookServiceV2Impl implements BookServiceV2 {
             executorService.shutdown();
         }
 
-
         uploadStatus.logResult();
         return uploadStatus;
     }

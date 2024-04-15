@@ -116,15 +116,15 @@ services:
       memlock:
         soft: -1
         hard: -1
-    command:
-      - /bin/bash
-      - -c
-      - |
-        if bin/elasticsearch-plugin list | grep -q "analysis-nori"; then
-          bin/elasticsearch-plugin remove analysis-nori &&
-        fi &&
-        bin/elasticsearch-plugin install analysis-nori &&
-        exec /usr/local/bin/docker-entrypoint.sh
+#    command:
+#      - /bin/bash
+#      - -c
+#      - |
+#        if bin/elasticsearch-plugin list | grep -q "analysis-nori"; then
+#          bin/elasticsearch-plugin remove analysis-nori &&
+#        fi &&
+#        bin/elasticsearch-plugin install analysis-nori &&
+#        exec /usr/local/bin/docker-entrypoint.sh
     healthcheck:
       test:
         [
@@ -171,15 +171,15 @@ services:
       memlock:
         soft: -1
         hard: -1
-    command:
-      - /bin/bash
-      - -c
-      - |
-        if bin/elasticsearch-plugin list | grep -q "analysis-nori"; then
-          bin/elasticsearch-plugin remove analysis-nori &&
-        fi &&
-        bin/elasticsearch-plugin install analysis-nori &&
-        exec /usr/local/bin/docker-entrypoint.sh
+#    command:
+#      - /bin/bash
+#      - -c
+#      - |
+#        if bin/elasticsearch-plugin list | grep -q "analysis-nori"; then
+#          bin/elasticsearch-plugin remove analysis-nori &&
+#        fi &&
+#        bin/elasticsearch-plugin install analysis-nori &&
+#        exec /usr/local/bin/docker-entrypoint.sh
     healthcheck:
       test:
         [
