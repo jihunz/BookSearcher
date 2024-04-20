@@ -1,6 +1,7 @@
 package com.jihun.booksearcher.book.controller;
 
 import com.jihun.booksearcher.book.service.BookServiceV2;
+import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,11 +14,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BookRestController {
 
-	private final BookServiceV2 bookServiceV2;
+	private final BookServiceV2 service;
+	private final EsServiceImpl esService;
 
 	@PostMapping("/upload")
 	public ResponseEntity<?> upload(@RequestBody Map<String, String> body) throws IOException {
-		return ResponseEntity.ok(bookServiceV2.uploadByFolder(body.get("dirPath")));
+		return ResponseEntity.ok(esService.addSettingMapping());
+//		return ResponseEntity.ok(service.uploadByFolder(body.get("dirPath")));
 	}
 
 //	@GetMapping("/search")

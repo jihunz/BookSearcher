@@ -12,4 +12,6 @@ public interface BookServiceV2 {
     UploadStatus uploadByFolder(String dirPath) throws IOException;
 
     List<BookV2> convert2List(File file);
+
 }
+

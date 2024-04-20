@@ -4,7 +4,7 @@ package com.jihun.booksearcher.book.service;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import com.jihun.booksearcher.book.dto.UploadStatus;
 import com.jihun.booksearcher.book.model.BookV2;
-import com.jihun.booksearcher.elasitcSearch.service.EsServiceImpl;
+import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
@@ -144,4 +144,5 @@ public class BookServiceV2Impl implements BookServiceV2 {
 
         return title && desc;
     }
+
 }

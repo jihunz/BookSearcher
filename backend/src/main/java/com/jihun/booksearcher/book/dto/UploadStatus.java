@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Data
 @NoArgsConstructor
-@Component 
+@Component
 public class UploadStatus {
     private int numOfFile = 0;
     private Map<String, String> uploadResult;
@@ -23,6 +23,8 @@ public class UploadStatus {
     private int uploadedBooks = 0;
     @JsonIgnore
     private LocalDateTime startTime;
+    private Duration elapseTime;
+
 
     public void initFileInfo(File[] files) {
         this.numOfFile = files.length;
@@ -30,7 +32,7 @@ public class UploadStatus {
     }
 
     public void logResult() {
-        log.info(String.valueOf(Duration.between(LocalDateTime.now(), this.startTime)));
+        this.setElapseTime(Duration.between(LocalDateTime.now(), this.startTime));
         log.info("[thread-upload completed]: {}", this);
     }
     public void logEach(String fileName, String msg) {

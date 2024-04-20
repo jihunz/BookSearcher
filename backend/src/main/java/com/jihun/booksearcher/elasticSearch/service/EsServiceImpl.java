@@ -1,16 +1,21 @@
-package com.jihun.booksearcher.elasitcSearch.service;
+package com.jihun.booksearcher.elasticSearch.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
 import com.jihun.booksearcher.book.model.BookV2;
-import com.jihun.booksearcher.elasitcSearch.config.EsConfig;
+import com.jihun.booksearcher.elasticSearch.config.EsConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Slf4j
@@ -18,6 +23,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EsServiceImpl {
     private final EsConfig esConfig;
+    @Value("${elasticsearch.index}")
+    private String idxName;
+    @Value("${elasticsearch.settingMappingPath}")
+    private String settingMappingPath;
 
     public BulkResponse bulkIdx(List<BookV2> list) throws IOException {
         ElasticsearchClient esClient = esConfig.elasticsearchClient();
@@ -25,6 +34,7 @@ public class EsServiceImpl {
         BulkRequest.Builder br = new BulkRequest.Builder();
 
         for (BookV2 item : list) {
+
             br.operations(op -> op
                     .index(idx -> idx
                             .index("book")
@@ -48,8 +58,23 @@ public class EsServiceImpl {
         return result;
     }
 
-    public void addMapping(List<BookV2> list) throws IOException {
-        ElasticsearchClient esClient = esConfig.elasticsearchClient();
 
+
+    // TODO: 인덱스가 없고 매핑이 없으면 실행
+    public boolean addSettingMapping() throws IOException {
+        try (InputStream json = Files.newInputStream(Paths.get(settingMappingPath))) {
+            CreateIndexRequest req = new CreateIndexRequest.Builder()
+                    .index(idxName)
+                    .withJson(json)
+                    .build();
+
+            ElasticsearchClient client = esConfig.elasticsearchClient();
+            return client.indices().create(req).acknowledged();
+        }
     }
+
 }
+
+
+
+

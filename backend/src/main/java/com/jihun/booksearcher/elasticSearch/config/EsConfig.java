@@ -1,4 +1,4 @@
-package com.jihun.booksearcher.elasitcSearch.config;
+package com.jihun.booksearcher.elasticSearch.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
