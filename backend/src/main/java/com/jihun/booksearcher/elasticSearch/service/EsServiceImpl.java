@@ -34,7 +34,6 @@ public class EsServiceImpl {
         BulkRequest.Builder br = new BulkRequest.Builder();
 
         for (BookV2 item : list) {
-
             br.operations(op -> op
                     .index(idx -> idx
                             .index("book")
@@ -58,8 +57,6 @@ public class EsServiceImpl {
         return result;
     }
 
-
-
     // TODO: 인덱스가 없고 매핑이 없으면 실행
     public boolean addSettingMapping() throws IOException {
         try (InputStream json = Files.newInputStream(Paths.get(settingMappingPath))) {
@@ -69,7 +66,9 @@ public class EsServiceImpl {
                     .build();
 
             ElasticsearchClient client = esConfig.elasticsearchClient();
-            return client.indices().create(req).acknowledged();
+            boolean res = client.indices().create(req).acknowledged();
+            log.info("[create setting and mapping]: {}", res);
+            return res;
         }
     }
 
