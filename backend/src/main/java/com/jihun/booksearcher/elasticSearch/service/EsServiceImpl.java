@@ -4,15 +4,11 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
-import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
-import co.elastic.clients.elasticsearch.indices.GetIndexRequest;
+import co.elastic.clients.elasticsearch.indices.*;
 import com.jihun.booksearcher.book.model.BookV2;
 import com.jihun.booksearcher.elasticSearch.config.EsConfig;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.client.RequestOptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,18 +26,16 @@ public class EsServiceImpl {
     private final EsConfig esConfig;
     private final ElasticsearchClient client;
 
-    @Value("${elasticsearch.index}")
-    private String idxName;
     @Value("${elasticsearch.settingMappingPath}")
-    private String settingMappingPath;
+    private String SETTING_MAPPING_PATH;
 
-    public BulkResponse bulkIdx(List<BookV2> list) throws IOException {
+    public BulkResponse bulkIdx(List<BookV2> list, String idxName) throws IOException {
         BulkRequest.Builder br = new BulkRequest.Builder();
 
         for (BookV2 item : list) {
             br.operations(op -> op
                     .index(idx -> idx
-                            .index("book")
+                            .index(idxName)
                             .id(String.valueOf(item.getId()))
                             .document(item)
                     )
@@ -62,23 +56,31 @@ public class EsServiceImpl {
         return result;
     }
 
-    // TODO: 인덱스가 없고 매핑이 없으면 실행
-    public boolean addSettingMapping() throws IOException {
-        try (InputStream json = Files.newInputStream(Paths.get(settingMappingPath))) {
+    public void createIdxAndSettingMapping(String idxName) throws IOException {
+        try (InputStream json = Files.newInputStream(Paths.get(SETTING_MAPPING_PATH))) {
             CreateIndexRequest req = new CreateIndexRequest.Builder()
                     .index(idxName)
                     .withJson(json)
                     .build();
 
             boolean res = client.indices().create(req).acknowledged();
-            log.info("[create setting and mapping]: {}", res);
-            return res;
+            log.info("[create index, setting, mapping]: {}", res);
         }
     }
 
-//    private boolean doesIndexExist(String indexName) throws IOException {
-//        GetIndexRequest request = new GetIndexRequest(indexName);
-//        return client.indices().exists(request, RequestOptions.DEFAULT);
+    public boolean doesIndexExist(String idxName) throws IOException {
+        ExistsRequest req = new ExistsRequest.Builder()
+                .index(idxName)
+                .build();
+        return client.indices().exists(req).value();
+    }
+
+//    public boolean doesMappingExist(String idxName) throws IOException {
+//        GetMappingRequest req = new GetMappingRequest.Builder()
+//                .index(idxName)
+//                .build();
+//        IndexMappingRecord res = client.indices().getMapping(req).get(idxName);
+//        return res != null;
 //    }
 
 }

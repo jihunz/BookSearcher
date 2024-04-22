@@ -19,8 +19,7 @@ public class BookRestController {
 
 	@PostMapping("/upload")
 	public ResponseEntity<?> upload(@RequestBody Map<String, String> body) throws IOException {
-		return ResponseEntity.ok(esService.addSettingMapping());
-//		return ResponseEntity.ok(service.uploadByFolder(body.get("dirPath")));
+		return ResponseEntity.ok(service.execUpload(body.get("dirPath")));
 	}
 
 //	@GetMapping("/search")

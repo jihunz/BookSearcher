@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface BookServiceV2 {
-
-    UploadStatus uploadByFolder(String dirPath) throws IOException;
-
-    List<BookV2> convert2List(File file);
+    UploadStatus execUpload(String dirPath) throws IOException;
 
 }
 

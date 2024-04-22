@@ -17,5 +17,6 @@ elasticsearch:
   apikey: TDZrcC1ZNEJiaGxzbmZRWnduZUo6TGRpald4UVFSd2l2RVpsOEdvRmhSQQ==
   userName: elastic
   password: 12341234
-  index: book
+  idxName: book
   settingMappingPath: backend/src/main/java/com/jihun/booksearcher/elasticSearch/config/settingAndMapping.json
+  bulkSize: 10000

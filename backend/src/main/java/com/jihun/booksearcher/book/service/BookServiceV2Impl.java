@@ -9,6 +9,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -27,11 +28,13 @@ public class BookServiceV2Impl implements BookServiceV2 {
     private final EsServiceImpl esService;
     private long id = 1;
     private final UploadStatus uploadStatus;
-    private final int BULK_SIZE = 10000;
+    @Value("${elasticsearch.bulkSize}")
+    private int BULK_SIZE;
+    @Value("${elasticsearch.idxName}")
+    private String IDX_NAME;
 
 
-    @Override
-    public UploadStatus uploadByFolder(String dirPath) throws IOException {
+    private UploadStatus uploadByFolder(String dirPath, String idxName) throws IOException {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
 
@@ -56,7 +59,7 @@ public class BookServiceV2Impl implements BookServiceV2 {
                             for (int i = 0; i < list.size(); i += BULK_SIZE) {
                                 int endIdx = Math.min(i + BULK_SIZE, list.size());
                                 List<BookV2> chunkedList = list.subList(i, endIdx);
-                                BulkResponse res = esService.bulkIdx(chunkedList);
+                                BulkResponse res = esService.bulkIdx(chunkedList, idxName);
 
                                 eachUploadCnt += res.items().size();
                                 uploadStatus.setUploadedBooks(res.items().size());
@@ -89,8 +92,7 @@ public class BookServiceV2Impl implements BookServiceV2 {
         return uploadStatus;
     }
 
-    @Override
-    public List<BookV2> convert2List(File file) {
+    private List<BookV2> convert2List(File file) {
         List<BookV2> list = new ArrayList<>();
 
         try (CSVReader reader = new CSVReader(new FileReader(file))) {
@@ -120,6 +122,12 @@ public class BookServiceV2Impl implements BookServiceV2 {
 
         uploadStatus.setNumOfBooks(uploadStatus.getNumOfBooks() + list.size());
         return list;
+    }
+
+    @Override
+    public UploadStatus execUpload(String dirPath) throws IOException {
+        if (!esService.doesIndexExist(this.IDX_NAME)) esService.createIdxAndSettingMapping(this.IDX_NAME);
+        return this.uploadByFolder(dirPath, this.IDX_NAME);
     }
 
     // 특정 행이 비어 있는지 확인하는 메서드
