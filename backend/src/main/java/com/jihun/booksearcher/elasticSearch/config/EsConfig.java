@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.Header;
 import org.apache.http.HttpHost;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
+@Data
 public class EsConfig {
     private ElasticsearchClient elasticsearchClient;
 
@@ -39,9 +41,8 @@ public class EsConfig {
     @Value("${elasticsearch.password}")
     private String password;
 
-    // 스프링이 이 Bean을 생성할 때 한 번만 호출되는 메서드
     @Bean
-    public ElasticsearchClient elasticsearchClient() {
+    public ElasticsearchClient createClient() {
         if (elasticsearchClient == null) {
             BasicCredentialsProvider credsProv = new BasicCredentialsProvider();
             credsProv.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
@@ -55,6 +56,6 @@ public class EsConfig {
 
             elasticsearchClient = new ElasticsearchClient(transport);
         }
-        return elasticsearchClient;
+        return this.elasticsearchClient;
     }
 }

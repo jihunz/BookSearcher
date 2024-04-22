@@ -5,10 +5,14 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.indices.CreateIndexRequest;
+import co.elastic.clients.elasticsearch.indices.GetIndexRequest;
 import com.jihun.booksearcher.book.model.BookV2;
 import com.jihun.booksearcher.elasticSearch.config.EsConfig;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.client.RequestOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +26,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EsServiceImpl {
+
     private final EsConfig esConfig;
+    private final ElasticsearchClient client;
+
     @Value("${elasticsearch.index}")
     private String idxName;
     @Value("${elasticsearch.settingMappingPath}")
     private String settingMappingPath;
 
     public BulkResponse bulkIdx(List<BookV2> list) throws IOException {
-        ElasticsearchClient esClient = esConfig.elasticsearchClient();
-
         BulkRequest.Builder br = new BulkRequest.Builder();
 
         for (BookV2 item : list) {
@@ -43,7 +48,7 @@ public class EsServiceImpl {
             );
         }
 
-        BulkResponse result = esClient.bulk(br.build());
+        BulkResponse result = client.bulk(br.build());
 
         if (result.errors()) {
             log.error("[EsServiceImpl-index]: Bulk had errors");
@@ -65,12 +70,16 @@ public class EsServiceImpl {
                     .withJson(json)
                     .build();
 
-            ElasticsearchClient client = esConfig.elasticsearchClient();
             boolean res = client.indices().create(req).acknowledged();
             log.info("[create setting and mapping]: {}", res);
             return res;
         }
     }
+
+//    private boolean doesIndexExist(String indexName) throws IOException {
+//        GetIndexRequest request = new GetIndexRequest(indexName);
+//        return client.indices().exists(request, RequestOptions.DEFAULT);
+//    }
 
 }
 
