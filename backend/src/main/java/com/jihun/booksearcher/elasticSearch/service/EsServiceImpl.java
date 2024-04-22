@@ -5,7 +5,7 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 import co.elastic.clients.elasticsearch.indices.*;
-import com.jihun.booksearcher.book.model.BookV2;
+import com.jihun.booksearcher.book.model.Book;
 import com.jihun.booksearcher.elasticSearch.config.EsConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +29,10 @@ public class EsServiceImpl {
     @Value("${elasticsearch.settingMappingPath}")
     private String SETTING_MAPPING_PATH;
 
-    public BulkResponse bulkIdx(List<BookV2> list, String idxName) throws IOException {
+    public BulkResponse bulkIdx(List<Book> list, String idxName) throws IOException {
         BulkRequest.Builder br = new BulkRequest.Builder();
 
-        for (BookV2 item : list) {
+        for (Book item : list) {
             br.operations(op -> op
                     .index(idx -> idx
                             .index(idxName)

@@ -1,6 +1,6 @@
 package com.jihun.booksearcher.book.controller;
 
-import com.jihun.booksearcher.book.service.BookServiceV2;
+import com.jihun.booksearcher.book.service.BookService;
 import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BookRestController {
 
-	private final BookServiceV2 service;
+	private final BookService service;
 	private final EsServiceImpl esService;
 
 	@PostMapping("/upload")

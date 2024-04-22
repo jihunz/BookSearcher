@@ -1,119 +1,156 @@
-//package com.jihun.booksearcher.book.service;
-//
-//import co.elastic.clients.elasticsearch.ElasticsearchClient;
-//import com.jihun.booksearcher.book.model.Book;
-//import com.jihun.booksearcher.elasitcSearch.EsClient;
-//import com.jihun.booksearcher.elasitcSearch.config.EsConfig;
-//import com.jihun.booksearcher.elasitcSearch.dao.Indexing;
-//import com.jihun.booksearcher.elasitcSearch.model.IndexVo;
-//import com.jihun.booksearcher.utils.BookCsvUploader;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.log4j.Log4j2;
-//import org.apache.commons.fileupload.FileItem;
-//import org.apache.commons.fileupload.disk.DiskFileItem;
-//import org.apache.commons.io.IOUtils;
-//import org.elasticsearch.action.search.SearchResponse;
-//import org.elasticsearch.search.SearchHit;
-//import org.springframework.stereotype.Service;
-//import org.springframework.web.multipart.MultipartFile;
-//import org.springframework.web.multipart.commons.CommonsMultipartFile;
-//
-//import java.io.*;
-//import java.nio.file.Files;
-//import java.util.*;
-//import java.util.concurrent.ExecutorService;
-//import java.util.concurrent.Executors;
-//
-//@Log4j2
-//@Service
-//@RequiredArgsConstructor
-//public class BookServiceImpl implements BookService {
-//    private final Indexing<?> indexing;
-//    private final EsClient esClient;
-//
-//    @Override
-//    public String upload(IndexVo indexVo) throws IOException {
-//        List<Map<String, Object>> list = BookCsvUploader.ReadCsvFile(indexVo.getExcelFile());
-//        return indexing.bulkIndexing(indexVo.getIndexName(), list);
-//    }
-//
-//    @Override
-//    public List<SearchHit[]> searchTest(String keyword) throws IOException {
-//        List<SearchHit[]> result = new ArrayList<>();
-//        Map<String, SearchResponse> searched = indexing.search(keyword);
-//        for (String s : searched.keySet()) {
-//            SearchHit[] hits = searched.get(s).getHits().getHits();
-//            Arrays.stream(hits)
-//                    .forEach(v -> {
-//                        System.out.println(v.getScore());
-//                    });
-//            result.add(hits);
-//        }
-//        return result;
-//    }
-//
-//    @Override
-//    public String uploadByFolder(String dirPath) throws IOException {
-//        File folder = new File(dirPath);
-//        File[] files = folder.listFiles();
-//
-//        if (files != null) {
-//            ExecutorService executorService = Executors.newFixedThreadPool(10);
-//
-//            for (File file : files) {
-//                if (file.isFile() && file.getName().endsWith(".csv")) {
-//                    executorSe rvice.submit(() -> {
-//                        try {
-//                            log.info("[thread]: new thread created");
-//                            List<Map<String, Object>> fileData = BookCsvUploader.ReadCsvFile(this.convert2MultipartFile(file));
-//                            indexing.bulkIndexing("book", fileData);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        } finally {
-//                            log.info("[thread]: completed");
-//                        }
-//                    });
-//                }
-//            }
-//
-//            executorService.shutdown();
-//            // 모든 작업이 완료될 때까지 대기
-//        }
-//        String msg = "[thread]: upload completed";
-//        log.info(msg);
-//        return msg;
-//    }
-//
-//    private MultipartFile convert2MultipartFile(File file) throws IOException {
-//        FileItem fileItem = new DiskFileItem("originFile", Files.probeContentType(file.toPath()), false, file.getName(), (int) file.length(), file.getParentFile());
-//
-//        InputStream is = new FileInputStream(file);
-//        OutputStream os = fileItem.getOutputStream();
-//        IOUtils.copy(is, os);
-//
-//        return new CommonsMultipartFile(fileItem);
-//    }
-//
-//    @Override
-//    public List<Book> search(String keyword) throws IOException {
-//        List<Book> result = new ArrayList<>();
-//        Map<String, SearchResponse> searched = indexing.search(keyword);
-//        Map<String, Object> titles = new HashMap<>();
-//
-//        for (String k : searched.keySet()) {
-//            SearchHit[] hits = searched.get(k).getHits().getHits();
-//            Arrays.stream(hits)
-//                    .forEach(v -> {
-////                        제목을 기준으로 중복된 검색 결과 제외
-//                        String title = String.valueOf(v.getSourceAsMap().get("title"));
-//                        String titleTrimmed = title.replace("\s", "");
-//                        if (titles.get(titleTrimmed) == null) {
-//                            result.add(new Book(v));
-//                            titles.put(titleTrimmed, titleTrimmed);
-//                        }
-//                    });
-//        }
-//        return result;
-//
-//    }
-//}
+package com.jihun.booksearcher.book.service;
+
+
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import com.jihun.booksearcher.book.dto.UploadStatus;
+import com.jihun.booksearcher.book.model.Book;
+import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.regex.Pattern;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class BookServiceImpl implements BookService {
+    private final EsServiceImpl esService;
+    private long id = 1;
+    private final UploadStatus uploadStatus;
+    @Value("${elasticsearch.bulkSize}")
+    private int BULK_SIZE;
+    @Value("${elasticsearch.idxName}")
+    private String IDX_NAME;
+
+
+    private UploadStatus uploadByFolder(String dirPath, String idxName) throws IOException {
+        File folder = new File(dirPath);
+        File[] files = folder.listFiles();
+
+        uploadStatus.initStartTime();
+        uploadStatus.initFileInfo(files);
+
+        if (files != null) {
+            ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+            CountDownLatch latch = new CountDownLatch(files.length);
+
+            for (File file : files) {
+                String name = file.getName();
+                if (file.isFile() && name.endsWith(".csv")) {
+                    executorService.submit(() -> {
+                        try {
+
+                            log.info("[thread]: {} thread created", name);
+                            List<Book> list = this.convert2List(file);
+                            int eachUploadCnt = 0;
+
+                            for (int i = 0; i < list.size(); i += BULK_SIZE) {
+                                int endIdx = Math.min(i + BULK_SIZE, list.size());
+                                List<Book> chunkedList = list.subList(i, endIdx);
+                                BulkResponse res = esService.bulkIdx(chunkedList, idxName);
+
+                                eachUploadCnt += res.items().size();
+                                uploadStatus.setUploadedBooks(res.items().size());
+                                String msg = uploadStatus.getUploadedRatio(list.size(), eachUploadCnt);
+                                uploadStatus.getUploadResult().put(name, msg);
+                                uploadStatus.logEach(name, msg);
+                            }
+
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        } finally {
+                            log.info("[thread]: {} completed", name);
+                            latch.countDown(); // 작업 완료 시 CountDownLatch 카운트 감소
+                        }
+                    });
+                }
+            }
+
+            try {
+                latch.await(); // 모든 스레드가 작업을 완료할 때까지 대기
+            } catch (InterruptedException e) {
+                log.error("Thread interrupted while waiting for tasks to complete.", e);
+                Thread.currentThread().interrupt(); // 인터럽트 상태 재설정
+            }
+
+            executorService.shutdown();
+        }
+
+        uploadStatus.logResult();
+        return uploadStatus;
+    }
+
+    private List<Book> convert2List(File file) {
+        List<Book> list = new ArrayList<>();
+
+        try (CSVReader reader = new CSVReader(new FileReader(file))) {
+            reader.skip(1);
+
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                if (isEmptyRow(nextLine) || isEmptyColumn(nextLine, 10) || !isKorean(nextLine)) {
+                    continue;
+                }
+
+                Book book = new Book();
+                book.setId(id++);
+                book.setIsbn(nextLine[1]); // ISBN 열
+                book.setTitle(nextLine[3]); // 제목 열
+                book.setAuthor(nextLine[4]); // 저자 열
+                book.setPublisher(nextLine[5]); // 출판사 열
+                book.setImg(nextLine[9]); // 이미지 URL 열
+                book.setDescription(nextLine[10]); // 책 소개 열
+                book.setKdc(!nextLine[11].isEmpty() ? nextLine[11] : null); // KDC 열
+                list.add(book);
+            }
+
+        } catch (IOException | CsvException e) {
+            e.printStackTrace();
+        }
+
+        uploadStatus.setNumOfBooks(uploadStatus.getNumOfBooks() + list.size());
+        return list;
+    }
+
+    @Override
+    public UploadStatus execUpload(String dirPath) throws IOException {
+        if (!esService.doesIndexExist(this.IDX_NAME)) esService.createIdxAndSettingMapping(this.IDX_NAME);
+        return this.uploadByFolder(dirPath, this.IDX_NAME);
+    }
+
+    // 특정 행이 비어 있는지 확인하는 메서드
+    private static boolean isEmptyRow(String[] row) {
+        for (String cell : row) {
+            if (!cell.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 특정 열이 비어 있는지 확인하는 메서드
+    private static boolean isEmptyColumn(String[] row, int columnIndex) {
+        return row.length <= columnIndex || row[columnIndex].isEmpty();
+    }
+
+    private static boolean isKorean(String[] row) {
+        String pattern = ".*[ㄱ-ㅎ가-힣]+.*"; // 한글을 포함하는 정규 표현식
+        boolean title = Pattern.matches(pattern, row[3]);
+        boolean desc = Pattern.matches(pattern, row[10]);
+
+        return title && desc;
+    }
+
+}
