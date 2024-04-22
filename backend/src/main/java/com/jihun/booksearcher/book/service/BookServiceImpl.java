@@ -2,7 +2,7 @@ package com.jihun.booksearcher.book.service;
 
 
 import co.elastic.clients.elasticsearch.core.BulkResponse;
-import com.jihun.booksearcher.book.dto.UploadStatus;
+import com.jihun.booksearcher.book.util.UploadStatus;
 import com.jihun.booksearcher.book.model.Book;
 import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
 import com.opencsv.CSVReader;

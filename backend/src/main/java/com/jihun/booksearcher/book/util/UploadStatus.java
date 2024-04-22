@@ -1,4 +1,4 @@
-package com.jihun.booksearcher.book.dto;
+package com.jihun.booksearcher.book.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
