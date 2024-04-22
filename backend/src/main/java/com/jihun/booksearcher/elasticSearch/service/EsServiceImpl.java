@@ -75,14 +75,6 @@ public class EsServiceImpl {
         return client.indices().exists(req).value();
     }
 
-//    public boolean doesMappingExist(String idxName) throws IOException {
-//        GetMappingRequest req = new GetMappingRequest.Builder()
-//                .index(idxName)
-//                .build();
-//        IndexMappingRecord res = client.indices().getMapping(req).get(idxName);
-//        return res != null;
-//    }
-
 }
 
 
