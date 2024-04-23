@@ -22,12 +22,9 @@ public class BookRestController {
 		return ResponseEntity.ok(service.execUpload(body.get("dirPath")));
 	}
 
-//	@GetMapping("/search")
-//	public ResponseEntity<?> search(String keyword) throws IOException {
-//		return ResponseEntity.ok(bookService.search(keyword));
-//	}
-//	@GetMapping("/searchTest")
-//	public ResponseEntity<?> searchTest(String keyword) throws IOException {
-//		return ResponseEntity.ok(bookService.searchTest(keyword));
-//	}
+	@GetMapping("/search")
+	public ResponseEntity<?> search(@RequestParam("keyword") String keyword) throws IOException {
+//		return ResponseEntity.ok(service.search(keyword));
+		return ResponseEntity.ok(esService.descMustQuery(keyword));
+	}
 }

@@ -130,6 +130,11 @@ public class BookServiceImpl implements BookService {
         return this.uploadByFolder(dirPath, this.IDX_NAME);
     }
 
+    @Override
+    public Book search(String keyword) {
+        return esService.search(keyword);
+    }
+
     // 특정 행이 비어 있는지 확인하는 메서드
     private static boolean isEmptyRow(String[] row) {
         for (String cell : row) {

@@ -1,9 +1,13 @@
 package com.jihun.booksearcher.elasticSearch.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.*;
 import com.jihun.booksearcher.book.model.Book;
 import com.jihun.booksearcher.elasticSearch.config.EsConfig;
@@ -75,6 +79,42 @@ public class EsServiceImpl {
         return client.indices().exists(req).value();
     }
 
+    public Book search(String keyword) {
+        return null;
+    }
+
+    public List<Hit<Book>> descMustQuery(String keyword) throws IOException {
+        Query matchByDesc = MatchQuery.of(m -> m
+                .field("description")
+                .query(keyword)
+        )._toQuery();
+
+        SearchResponse<Book> response = client.search(s -> s
+                        .index("book")
+                        .query(q -> q
+                                .bool(b -> b
+                                    .must(matchByDesc)
+                                )
+                        ),
+                Book.class
+        );
+
+        List<Hit<Book>> hits = response.hits().hits();
+        for (Hit<Book> hit : hits) {
+            System.out.println(hit.source());
+        }
+        return hits;
+    }
+
+//    private static Query allShouldQuery(String keyword) {
+//        return QueryBuilders.boolQuery()
+//                .should(QueryBuilders.matchQuery("title", keyword).operator(Operator.AND).boost(2))
+//                .should(QueryBuilders.matchQuery("description", keyword).operator(Operator.AND).boost(4))
+//                .should(QueryBuilders.matchPhraseQuery("title", keyword).boost(3))
+//                .should(QueryBuilders.matchPhraseQuery("description", keyword).boost(5))
+//                .should(QueryBuilders.matchQuery("subInfoText", keyword))
+//                .should(QueryBuilders.matchPhraseQuery("subInfoText", keyword));
+//    }
 }
 
 

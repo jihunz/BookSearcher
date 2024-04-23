@@ -31,72 +31,10 @@
 //    private final Indexing<?> indexing;
 //    private final EsClient esClient;
 //
-//    @Override
-//    public String upload(IndexVo indexVo) throws IOException {
-//        List<Map<String, Object>> list = BookCsvUploader.ReadCsvFile(indexVo.getExcelFile());
-//        return indexing.bulkIndexing(indexVo.getIndexName(), list);
-//    }
 //
 //    @Override
-//    public List<SearchHit[]> searchTest(String keyword) throws IOException {
-//        List<SearchHit[]> result = new ArrayList<>();
-//        Map<String, SearchResponse> searched = indexing.search(keyword);
-//        for (String s : searched.keySet()) {
-//            SearchHit[] hits = searched.get(s).getHits().getHits();
-//            Arrays.stream(hits)
-//                    .forEach(v -> {
-//                        System.out.println(v.getScore());
-//                    });
-//            result.add(hits);
-//        }
-//        return result;
-//    }
-//
-//    @Override
-//    public String uploadByFolder(String dirPath) throws IOException {
-//        File folder = new File(dirPath);
-//        File[] files = folder.listFiles();
-//
-//        if (files != null) {
-//            ExecutorService executorService = Executors.newFixedThreadPool(10);
-//
-//            for (File file : files) {
-//                if (file.isFile() && file.getName().endsWith(".csv")) {
-//                    executorSe rvice.submit(() -> {
-//                        try {
-//                            log.info("[thread]: new thread created");
-//                            List<Map<String, Object>> fileData = BookCsvUploader.ReadCsvFile(this.convert2MultipartFile(file));
-//                            indexing.bulkIndexing("book", fileData);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        } finally {
-//                            log.info("[thread]: completed");
-//                        }
-//                    });
-//                }
-//            }
-//
-//            executorService.shutdown();
-//            // 모든 작업이 완료될 때까지 대기
-//        }
-//        String msg = "[thread]: upload completed";
-//        log.info(msg);
-//        return msg;
-//    }
-//
-//    private MultipartFile convert2MultipartFile(File file) throws IOException {
-//        FileItem fileItem = new DiskFileItem("originFile", Files.probeContentType(file.toPath()), false, file.getName(), (int) file.length(), file.getParentFile());
-//
-//        InputStream is = new FileInputStream(file);
-//        OutputStream os = fileItem.getOutputStream();
-//        IOUtils.copy(is, os);
-//
-//        return new CommonsMultipartFile(fileItem);
-//    }
-//
-//    @Override
-//    public List<Book> search(String keyword) throws IOException {
-//        List<Book> result = new ArrayList<>();
+//    public Book search(String keyword) throws IOException {
+//        Book result = new ArrayList<>();
 //        Map<String, SearchResponse> searched = indexing.search(keyword);
 //        Map<String, Object> titles = new HashMap<>();
 //
