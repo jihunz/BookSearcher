@@ -1,7 +1,9 @@
 package com.jihun.booksearcher.elasticSearch.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.MatchPhraseQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
@@ -11,6 +13,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.*;
 import com.jihun.booksearcher.book.model.Book;
 import com.jihun.booksearcher.elasticSearch.config.EsConfig;
+import com.jihun.booksearcher.elasticSearch.util.QueryMaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,7 +96,7 @@ public class EsServiceImpl {
                         .index("book")
                         .query(q -> q
                                 .bool(b -> b
-                                    .must(matchByDesc)
+                                        .must(matchByDesc)
                                 )
                         ),
                 Book.class
@@ -106,15 +109,35 @@ public class EsServiceImpl {
         return hits;
     }
 
-//    private static Query allShouldQuery(String keyword) {
-//        return QueryBuilders.boolQuery()
-//                .should(QueryBuilders.matchQuery("title", keyword).operator(Operator.AND).boost(2))
-//                .should(QueryBuilders.matchQuery("description", keyword).operator(Operator.AND).boost(4))
-//                .should(QueryBuilders.matchPhraseQuery("title", keyword).boost(3))
-//                .should(QueryBuilders.matchPhraseQuery("description", keyword).boost(5))
-//                .should(QueryBuilders.matchQuery("subInfoText", keyword))
-//                .should(QueryBuilders.matchPhraseQuery("subInfoText", keyword));
-//    }
+    public List<Hit<Book>> allShouldQuery(String keyword) throws IOException {
+//        Query matchTitle = QueryMaker.match("title", keyword, Operator.And, 2F);
+//        Query matchDesc = QueryMaker.match("description", keyword, Operator.And, 4F);
+//        Query matchPhraseTitle = QueryMaker.matchPhrase("title", keyword, 3F);
+//        Query matchPhraseDesc = QueryMaker.matchPhrase("title", keyword, 5F);
+        Query matchSubInfoText = QueryMaker.match("title", keyword);
+//        Query matchPhraseSubInfoText = QueryMaker.matchPhrase("description", keyword);
+
+        SearchResponse<Book> response = client.search(s -> s
+                        .index("book")
+                        .query(q -> q
+                                .bool(b -> b
+//                                        .should(matchTitle)
+//                                        .should(matchDesc)
+//                                        .should(matchPhraseTitle)
+//                                        .should(matchPhraseDesc)
+                                        .should(matchSubInfoText)
+//                                        .should(matchPhraseSubInfoText)
+                                )
+                        ),
+                Book.class
+        );
+
+        List<Hit<Book>> hits = response.hits().hits();
+        for (Hit<Book> hit : hits) {
+            System.out.println(hit.source());
+        }
+        return hits;
+    }
 }
 
 

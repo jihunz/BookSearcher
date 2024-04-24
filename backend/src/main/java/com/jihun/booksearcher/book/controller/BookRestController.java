@@ -25,6 +25,6 @@ public class BookRestController {
 	@GetMapping("/search")
 	public ResponseEntity<?> search(@RequestParam("keyword") String keyword) throws IOException {
 //		return ResponseEntity.ok(service.search(keyword));
-		return ResponseEntity.ok(esService.descMustQuery(keyword));
+		return ResponseEntity.ok(esService.allShouldQuery(keyword));
 	}
 }
