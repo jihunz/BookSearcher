@@ -30,6 +30,21 @@ public class UploadStatus {
         this.numOfFile = files.length;
         this.uploadResult = Arrays.stream(files).collect(Collectors.toMap(k -> k.getName(), v -> "0"));
     }
+    public void initStartTime() {
+        this.startTime = LocalDateTime.now();
+    }
+
+    public void initBooks() {
+        this.numOfBooks = 0;
+        this.uploadedBooks = 0;
+    }
+
+    public void initUploadStatus(File[] files) {
+        this.initFileInfo(files);
+        this.initStartTime();
+        this.initBooks();
+
+    }
 
     public void logResult() {
         this.setElapseTime(Duration.between(LocalDateTime.now(), this.startTime));
@@ -56,7 +71,6 @@ public class UploadStatus {
         this.uploadedBooks += num;
     }
 
-    public void initStartTime() {
-        this.startTime = LocalDateTime.now();
-    }
+
+
 }

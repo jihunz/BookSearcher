@@ -38,8 +38,7 @@ public class BookServiceImpl implements BookService {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
 
-        uploadStatus.initStartTime();
-        uploadStatus.initFileInfo(files);
+        uploadStatus.initUploadStatus(files);
 
         if (files != null) {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
