@@ -134,9 +134,17 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Book> search(String keyword) throws IOException {
         List<Hit<Book>> hits = esService.descMustQuery(keyword);
-        List<Book> result = hits.stream()
-                .map(Book::new)
-                .toList();
+        List<Book> result = new ArrayList<>();
+        Map<String, String> titles = new HashMap<>();
+
+        hits.forEach(v -> {
+            String title = v.source().getTitle();
+            String titleSource = title.replace("\s", "");
+            if (titles.get(titleSource) == null) {
+                titles.put(titleSource, titleSource);
+                result.add(new Book(v));
+            }
+        });
 
         int resultSize;
 //        if (resultSize <= 2) {
