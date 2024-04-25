@@ -2,6 +2,7 @@ package com.jihun.booksearcher.book.service;
 
 
 import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.jihun.booksearcher.book.util.UploadStatus;
 import com.jihun.booksearcher.book.model.Book;
 import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
@@ -20,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -130,8 +132,17 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book search(String keyword) {
-        return esService.search(keyword);
+    public List<Book> search(String keyword) throws IOException {
+        List<Hit<Book>> hits = esService.descMustQuery(keyword);
+        List<Book> result = hits.stream()
+                .map(Book::new)
+                .toList();
+
+        int resultSize;
+//        if (resultSize <= 2) {
+//        }
+
+        return result;
     }
 
     // 특정 행이 비어 있는지 확인하는 메서드

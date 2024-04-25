@@ -82,10 +82,6 @@ public class EsServiceImpl {
         return client.indices().exists(req).value();
     }
 
-    public Book search(String keyword) {
-        return null;
-    }
-
     public List<Hit<Book>> descMustQuery(String keyword) throws IOException {
         Query matchByDesc = MatchQuery.of(m -> m
                 .field("description")
@@ -102,41 +98,33 @@ public class EsServiceImpl {
                 Book.class
         );
 
-        List<Hit<Book>> hits = response.hits().hits();
-        for (Hit<Book> hit : hits) {
-            System.out.println(hit.source());
-        }
-        return hits;
+        return response.hits().hits();
     }
 
     public List<Hit<Book>> allShouldQuery(String keyword) throws IOException {
-//        Query matchTitle = QueryMaker.match("title", keyword, Operator.And, 2F);
-//        Query matchDesc = QueryMaker.match("description", keyword, Operator.And, 4F);
-//        Query matchPhraseTitle = QueryMaker.matchPhrase("title", keyword, 3F);
-//        Query matchPhraseDesc = QueryMaker.matchPhrase("title", keyword, 5F);
-        Query matchSubInfoText = QueryMaker.match("title", keyword);
-//        Query matchPhraseSubInfoText = QueryMaker.matchPhrase("description", keyword);
+        Query matchTitle = QueryMaker.match(keyword, "title",  Operator.And, 2F);
+        Query matchDesc = QueryMaker.match(keyword, "description",  Operator.And, 4F);
+        Query matchPhraseTitle = QueryMaker.matchPhrase(keyword, "title",  3F);
+        Query matchPhraseDesc = QueryMaker.matchPhrase(keyword, "title",  5F);
+        Query matchSubInfoText = QueryMaker.match(keyword, "title")  ;
+        Query matchPhraseSubInfoText = QueryMaker.matchPhrase(keyword, "description") ;
 
         SearchResponse<Book> response = client.search(s -> s
                         .index("book")
                         .query(q -> q
                                 .bool(b -> b
-//                                        .should(matchTitle)
-//                                        .should(matchDesc)
-//                                        .should(matchPhraseTitle)
-//                                        .should(matchPhraseDesc)
+                                        .should(matchTitle)
+                                        .should(matchDesc)
+                                        .should(matchPhraseTitle)
+                                        .should(matchPhraseDesc)
                                         .should(matchSubInfoText)
-//                                        .should(matchPhraseSubInfoText)
+                                        .should(matchPhraseSubInfoText)
                                 )
                         ),
                 Book.class
         );
 
-        List<Hit<Book>> hits = response.hits().hits();
-        for (Hit<Book> hit : hits) {
-            System.out.println(hit.source());
-        }
-        return hits;
+        return response.hits().hits();
     }
 }
 
