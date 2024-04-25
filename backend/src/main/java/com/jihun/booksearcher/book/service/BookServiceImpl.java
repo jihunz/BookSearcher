@@ -146,15 +146,17 @@ public class BookServiceImpl implements BookService {
             }
         });
 
-//        int resultSize = result.size();
-//        if (resultSize < 10) {
-//            List<Hit<Book>> allShouldHits = esService.allShouldQuery(keyword);
-//            allShouldHits.forEach(v -> {
-//                if (!isTitleDuplicated(v.source().getTitle())) {
-//                    result.add(new Book(v));
-//                }
-//            });
-//        }
+
+        // TODO: 결과 list 10개로 제한해야 함
+        int resultSize = result.size();
+        if (resultSize < 10) {
+            List<Hit<Book>> allShouldHits = esService.allShouldQuery(keyword);
+            allShouldHits.forEach(v -> {
+                if (!isTitleDuplicated(v.source().getTitle())) {
+                    result.add(new Book(v));
+                }
+            });
+        }
 
         return result;
     }
