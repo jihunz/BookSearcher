@@ -34,6 +34,8 @@ public class BookServiceImpl implements BookService {
     private int BULK_SIZE;
     @Value("${elasticsearch.idxName}")
     private String IDX_NAME;
+    Map<String, String> titles;
+
 
 
     private UploadStatus uploadByFolder(String dirPath, String idxName) throws IOException {
@@ -133,24 +135,37 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> search(String keyword) throws IOException {
-        List<Hit<Book>> hits = esService.descMustQuery(keyword);
+        this.titles = new HashMap<>();
         List<Book> result = new ArrayList<>();
-        Map<String, String> titles = new HashMap<>();
 
-        hits.forEach(v -> {
-            String title = v.source().getTitle();
-            String titleSource = title.replace("\s", "");
-            if (titles.get(titleSource) == null) {
-                titles.put(titleSource, titleSource);
+        List<Hit<Book>> descMustHits = esService.descMustQuery(keyword);
+
+        descMustHits.forEach(v -> {
+            if (!isTitleDuplicated(v.source().getTitle())) {
                 result.add(new Book(v));
             }
         });
 
-        int resultSize;
-//        if (resultSize <= 2) {
+//        int resultSize = result.size();
+//        if (resultSize < 10) {
+//            List<Hit<Book>> allShouldHits = esService.allShouldQuery(keyword);
+//            allShouldHits.forEach(v -> {
+//                if (!isTitleDuplicated(v.source().getTitle())) {
+//                    result.add(new Book(v));
+//                }
+//            });
 //        }
 
         return result;
+    }
+
+    private boolean isTitleDuplicated(String title) {
+        String titleSource = title.replace("\s", "");
+        if (this.titles.get(titleSource) == null) {
+            this.titles.put(titleSource, titleSource);
+            return false;
+        }
+        return true;
     }
 
     // 특정 행이 비어 있는지 확인하는 메서드

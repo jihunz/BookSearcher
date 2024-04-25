@@ -12,8 +12,8 @@ import static java.util.Objects.isNull;
 @Data
 @NoArgsConstructor
 public class Book {
-    private long  id;
     private float score;
+    private long  id;
     @CsvBindByName(column = "ISBN_THIRTEEN_NO")
     private String isbn;
     @CsvBindByName(column = "TITLE_NM")
