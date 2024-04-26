@@ -3,6 +3,7 @@ package com.jihun.booksearcher.elasticSearch.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchPhraseQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
@@ -81,10 +82,15 @@ public class EsServiceImpl {
         return client.indices().exists(req).value();
     }
 
-    // must + m -> 단어 반드시 포함
+    // match: 어절 일부 포함
+    // match + and: 어절 모두 포함, 순서 불일치
+    // match phrase: 어절 모두 포함, 순서 일치
+    //TODO: 해당 메서드를 제외한 이유 -> '셰프처럼 파스타 만드는 방법'의 검색 결과는 대동소이 -> '한국의 인문학 상황'의 결과는 뺐을 때 정확함
+
     public List<Hit<Book>> descMustQuery(String keyword) throws IOException {
         Query matchByDesc = MatchQuery.of(m -> m
                 .field("description")
+                .operator(Operator.And)
                 .query(keyword)
         )._toQuery();
 
@@ -101,7 +107,8 @@ public class EsServiceImpl {
         return response.hits().hits();
     }
 
-    // should + mp, m -> 구 포함하면 가중, 단어 포함, 단어 하나라도 포함
+    // TODO: 제목, 저자 검색은 필터의 속성으로 각각 분리 -> 독립된 메서드들 만들기
+    // should + mp, m: 공백이 포함된 어절이 포함되면 가중 -> 복수의 어절 포함 -> 어절 하나라도 포함
     public List<Hit<Book>> titleDescShouldQuery(String keyword) throws IOException {
         Query matchTitle = QueryMaker.match(keyword, "title");
         Query matchDesc = QueryMaker.match(keyword, "description");
