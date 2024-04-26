@@ -3,7 +3,6 @@ package com.jihun.booksearcher.book.service;
 
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import com.jihun.booksearcher.book.util.LimitedArrayList;
 import com.jihun.booksearcher.book.util.UploadStatus;
 import com.jihun.booksearcher.book.model.Book;
 import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
@@ -22,7 +21,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -137,7 +135,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Book> search(String keyword) throws IOException {
         this.titles = new HashMap<>();
-        List<Book> result = new LimitedArrayList<>(10);
+        List<Book> result = new ArrayList<>();
 
         List<Hit<Book>> descMustHits = esService.descMustQuery(keyword);
         descMustHits.forEach(v -> {
@@ -150,7 +148,7 @@ public class BookServiceImpl implements BookService {
         if (resultSize < 10) {
             List<Hit<Book>> allShouldHits = esService.allShouldQuery(keyword);
             allShouldHits.forEach(v -> {
-                if (!isTitleDuplicated(v.source().getTitle())) {
+                if (!isTitleDuplicated(v.source().getTitle()) && result.size() != 10) {
                     result.add(new Book(v));
                 }
             });
