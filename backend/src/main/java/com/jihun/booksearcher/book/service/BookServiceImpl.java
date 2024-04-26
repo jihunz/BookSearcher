@@ -3,6 +3,7 @@ package com.jihun.booksearcher.book.service;
 
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
+import com.jihun.booksearcher.book.util.LimitedArrayList;
 import com.jihun.booksearcher.book.util.UploadStatus;
 import com.jihun.booksearcher.book.model.Book;
 import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
@@ -136,18 +137,15 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Book> search(String keyword) throws IOException {
         this.titles = new HashMap<>();
-        List<Book> result = new ArrayList<>();
+        List<Book> result = new LimitedArrayList<>(10);
 
         List<Hit<Book>> descMustHits = esService.descMustQuery(keyword);
-
         descMustHits.forEach(v -> {
             if (!isTitleDuplicated(v.source().getTitle())) {
                 result.add(new Book(v));
             }
         });
 
-
-        // TODO: 결과 list 10개로 제한해야 함
         int resultSize = result.size();
         if (resultSize < 10) {
             List<Hit<Book>> allShouldHits = esService.allShouldQuery(keyword);
