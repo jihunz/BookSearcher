@@ -144,11 +144,10 @@ public class BookServiceImpl implements BookService {
             }
         });
 
-        int resultSize = result.size();
-        if (resultSize < 10) {
+        if (result.size() < 10) {
             List<Hit<Book>> allShouldHits = esService.allShouldQuery(keyword);
             allShouldHits.forEach(v -> {
-                if (!isTitleDuplicated(v.source().getTitle()) && result.size() != 10) {
+                if (!isTitleDuplicated(v.source().getTitle()) && result.size() < 10) {
                     result.add(new Book(v));
                 }
             });
