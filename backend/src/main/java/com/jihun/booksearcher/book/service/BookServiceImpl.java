@@ -137,21 +137,21 @@ public class BookServiceImpl implements BookService {
         this.titles = new HashMap<>();
         List<Book> result = new ArrayList<>();
 
-        List<Hit<Book>> descMustHits = esService.descMustQuery(keyword);
-        descMustHits.forEach(v -> {
-            if (!isTitleDuplicated(v.source().getTitle())) {
-                result.add(new Book(v));
-            }
-        });
+//        List<Hit<Book>> hit1 = esService.descMustQuery(keyword);
+//        hit1.forEach(v -> {
+//            if (!isTitleDuplicated(v.source().getTitle())) {
+//                result.add(new Book(v));
+//            }
+//        });
 
-        if (result.size() < 10) {
-            List<Hit<Book>> allShouldHits = esService.allShouldQuery(keyword);
-            allShouldHits.forEach(v -> {
+//        if (result.size() < 10) {
+            List<Hit<Book>> hit2 = esService.titleDescShouldQuery(keyword);
+            hit2.forEach(v -> {
                 if (!isTitleDuplicated(v.source().getTitle()) && result.size() < 10) {
                     result.add(new Book(v));
                 }
             });
-        }
+//        }
 
         return result;
     }

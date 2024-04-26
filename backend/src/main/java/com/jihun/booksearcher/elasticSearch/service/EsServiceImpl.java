@@ -3,7 +3,6 @@ package com.jihun.booksearcher.elasticSearch.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchPhraseQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
@@ -82,6 +81,7 @@ public class EsServiceImpl {
         return client.indices().exists(req).value();
     }
 
+    // must + m -> 단어 반드시 포함
     public List<Hit<Book>> descMustQuery(String keyword) throws IOException {
         Query matchByDesc = MatchQuery.of(m -> m
                 .field("description")
@@ -101,13 +101,14 @@ public class EsServiceImpl {
         return response.hits().hits();
     }
 
-    public List<Hit<Book>> allShouldQuery(String keyword) throws IOException {
-        Query matchTitle = QueryMaker.match(keyword, "title",  Operator.And, 2F);
-        Query matchDesc = QueryMaker.match(keyword, "description",  Operator.And, 4F);
-        Query matchPhraseTitle = QueryMaker.matchPhrase(keyword, "title",  3F);
-        Query matchPhraseDesc = QueryMaker.matchPhrase(keyword, "title",  5F);
-        Query matchSubInfoText = QueryMaker.match(keyword, "title")  ;
-        Query matchPhraseSubInfoText = QueryMaker.matchPhrase(keyword, "description") ;
+    // should + mp, m -> 구 포함하면 가중, 단어 포함, 단어 하나라도 포함
+    public List<Hit<Book>> titleDescShouldQuery(String keyword) throws IOException {
+        Query matchTitle = QueryMaker.match(keyword, "title");
+        Query matchDesc = QueryMaker.match(keyword, "description");
+        Query matchPhraseTitle = QueryMaker.matchPhrase(keyword, "title", 2F);
+        Query matchPhraseDesc = QueryMaker.matchPhrase(keyword, "description", 2F);
+//        Query matchSubInfoText = QueryMaker.match(keyword, "subInfoText");
+//        Query matchPhraseSubInfoText = QueryMaker.matchPhrase(keyword, "subInfoText");
 
         SearchResponse<Book> response = client.search(s -> s
                         .index("book")
@@ -117,8 +118,8 @@ public class EsServiceImpl {
                                         .should(matchDesc)
                                         .should(matchPhraseTitle)
                                         .should(matchPhraseDesc)
-                                        .should(matchSubInfoText)
-                                        .should(matchPhraseSubInfoText)
+//                                        .should(matchSubInfoText)
+//                                        .should(matchPhraseSubInfoText)
                                 )
                         ),
                 Book.class

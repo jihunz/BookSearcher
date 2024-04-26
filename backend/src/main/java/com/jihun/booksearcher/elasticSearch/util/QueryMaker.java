@@ -10,32 +10,41 @@ import org.springframework.stereotype.Component;
 public class QueryMaker {
     public static Query match(String keyword, String field, Operator op, float boost) {
         return MatchQuery.of(m -> m
+                .query(keyword)
                 .field(field)
                 .operator(op)
                 .boost(boost)
-                .query(keyword)
         )._toQuery();
     }
 
     public static Query match(String keyword, String field) {
         return MatchQuery.of(m -> m
-                .field(field)
                 .query(keyword)
+                .field(field)
+        )._toQuery();
+    }
+
+    public static Query match(String keyword, String field, Operator op) {
+        return MatchQuery.of(m -> m
+                .query(keyword)
+                .field(field)
+                .operator(op)
+
         )._toQuery();
     }
 
     public static Query matchPhrase(String keyword, String field, float boost) {
         return MatchPhraseQuery.of(m -> m
+                .query(keyword)
                 .field(field)
                 .boost(boost)
-                .query(keyword)
         )._toQuery();
     }
 
     public static Query matchPhrase(String keyword, String field) {
         return MatchPhraseQuery.of(m -> m
-                .field(field)
                 .query(keyword)
+                .field(field)
         )._toQuery();
     }
 }
