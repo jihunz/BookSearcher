@@ -44,7 +44,7 @@ public class BookServiceImpl implements BookService {
         uploadStatus.initUploadStatus(files);
 
         if (files != null) {
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
+            ExecutorService executorService = Executors.newFixedThreadPool(5);
 
             CountDownLatch latch = new CountDownLatch(files.length);
 
