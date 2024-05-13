@@ -88,17 +88,13 @@ public class EsServiceImpl {
     //TODO: 해당 메서드를 제외한 이유 -> '셰프처럼 파스타 만드는 방법'의 검색 결과는 대동소이 -> '한국의 인문학 상황'의 결과는 뺐을 때 정확함
 
     public List<Hit<Book>> descMustQuery(String keyword) throws IOException {
-        Query matchByDesc = MatchQuery.of(m -> m
-                .field("description")
-                .operator(Operator.And)
-                .query(keyword)
-        )._toQuery();
+        Query matchAndDesc = QueryMaker.match(keyword, "description", Operator.And);
 
         SearchResponse<Book> response = client.search(s -> s
                         .index("book")
                         .query(q -> q
                                 .bool(b -> b
-                                        .must(matchByDesc)
+                                        .must(matchAndDesc)
                                 )
                         ),
                 Book.class
