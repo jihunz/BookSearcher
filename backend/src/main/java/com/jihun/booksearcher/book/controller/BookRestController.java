@@ -1,5 +1,6 @@
 package com.jihun.booksearcher.book.controller;
 
+import com.jihun.booksearcher.book.enums.SearchType;
 import com.jihun.booksearcher.book.service.BookService;
 import com.jihun.booksearcher.elasticSearch.service.EsServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/book")
@@ -23,7 +25,18 @@ public class BookRestController {
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<?> search(@RequestParam("keyword") String keyword) throws IOException {
-		return ResponseEntity.ok(service.search(keyword));
+	public ResponseEntity<?> search(@RequestParam("type") String type, @RequestParam("keyword") String keyword) throws IOException {
+		//TODO: case 값 enum으로 대체
+
+		String subInfo = SearchType.SUB_INFO.getValue();
+
+		switch (type) {
+			case "desc":
+				return ResponseEntity.ok(service.searchTitleDesc(keyword));
+			case "subInfo":
+				return ResponseEntity.ok(service.searchSubInfo(keyword));
+			default:
+				return null;
+		}
 	}
 }

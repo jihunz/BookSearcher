@@ -36,7 +36,6 @@ public class BookServiceImpl implements BookService {
     Map<String, String> titles;
 
 
-
     private UploadStatus uploadByFolder(String dirPath, String idxName) throws IOException {
         File folder = new File(dirPath);
         File[] files = folder.listFiles();
@@ -133,25 +132,31 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<Book> search(String keyword) throws IOException {
+    public List<Book> searchTitleDesc(String keyword) throws IOException {
         this.titles = new HashMap<>();
         List<Book> result = new ArrayList<>();
 
-//        List<Hit<Book>> hit1 = esService.descMustQuery(keyword);
-//        hit1.forEach(v -> {
-//            if (!isTitleDuplicated(v.source().getTitle())) {
-//                result.add(new Book(v));
-//            }
-//        });
+        List<Hit<Book>> hit = esService.titleDescShouldQuery(keyword);
+        hit.forEach(v -> {
+            if (!isTitleDuplicated(v.source().getTitle()) && result.size() < 10) {
+                result.add(new Book(v));
+            }
+        });
 
-//        if (result.size() < 10) {
-            List<Hit<Book>> hit2 = esService.titleDescShouldQuery(keyword);
-            hit2.forEach(v -> {
-                if (!isTitleDuplicated(v.source().getTitle()) && result.size() < 10) {
-                    result.add(new Book(v));
-                }
-            });
-//        }
+        return result;
+    }
+
+    @Override
+    public List<Book> searchSubInfo(String keyword) throws IOException {
+        this.titles = new HashMap<>();
+        List<Book> result = new ArrayList<>();
+
+        List<Hit<Book>> hit = esService.descMustQuery(keyword);
+        hit.forEach(v -> {
+            if (!isTitleDuplicated(v.source().getTitle())) {
+                result.add(new Book(v));
+            }
+        });
 
         return result;
     }
