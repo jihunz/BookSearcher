@@ -138,7 +138,7 @@ public class BookServiceImpl implements BookService {
 
         List<Hit<Book>> hit = esService.titleDescShouldQuery(keyword);
         hit.forEach(v -> {
-            if (!isTitleDuplicated(v.source().getTitle()) && result.size() < 10) {
+            if (!isTitleDuplicated(v.source().getTitle())) {
                 result.add(new Book(v));
             }
         });
