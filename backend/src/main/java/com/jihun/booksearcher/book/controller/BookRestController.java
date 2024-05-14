@@ -17,7 +17,6 @@ import java.util.Map;
 public class BookRestController {
 
 	private final BookService service;
-	private final EsServiceImpl esService;
 
 	@PostMapping("/upload")
 	public ResponseEntity<?> upload(@RequestBody Map<String, String> body) throws IOException {
@@ -26,17 +25,11 @@ public class BookRestController {
 
 	@GetMapping("/search")
 	public ResponseEntity<?> search(@RequestParam("type") String type, @RequestParam("keyword") String keyword) throws IOException {
-		//TODO: case 값 enum으로 대체
+		SearchType searchType = SearchType.valueOf(type.toUpperCase());
 
-		String subInfo = SearchType.SUB_INFO.getValue();
-
-		switch (type) {
-			case "desc":
-				return ResponseEntity.ok(service.searchTitleDesc(keyword));
-			case "subInfo":
-				return ResponseEntity.ok(service.searchSubInfo(keyword));
-			default:
-				return null;
-		}
+        return switch (searchType) {
+            case DESC -> ResponseEntity.ok(service.searchTitleDesc(keyword));
+            case SUB_INFO -> ResponseEntity.ok(service.searchSubInfo(keyword));
+        };
 	}
 }
