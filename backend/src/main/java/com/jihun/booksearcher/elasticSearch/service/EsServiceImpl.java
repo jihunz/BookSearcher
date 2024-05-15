@@ -85,8 +85,7 @@ public class EsServiceImpl {
     // match: 어절 일부 포함
     // match + and: 어절 모두 포함, 순서 불일치
     // match phrase: 어절 모두 포함, 순서 일치
-    //TODO: 해당 메서드를 별도로 분리한 이유유 -> '셰프처럼 파스타 만드는 방법'의 검색 결과는 대동소이 -> '한국의 인문학 상황'의 결과는 뺐을 때 무관한 결과가 검색되지 않음
-
+    //TODO: 해당 메서드를 별도로 분리한 이유 -> '셰프처럼 파스타 만드는 방법'의 검색 결과는 대동소이 -> '한국의 인문학 상황'의 결과는 뺐을 때 무관한 결과가 검색되지 않음
     public List<Hit<Book>> descMustQuery(String keyword) throws IOException {
         Query matchAndDesc = QueryMaker.match(keyword, "description", Operator.And);
 
@@ -99,7 +98,6 @@ public class EsServiceImpl {
                         ),
                 Book.class
         );
-
         return response.hits().hits();
     }
 
@@ -122,7 +120,22 @@ public class EsServiceImpl {
                         ),
                 Book.class
         );
+        return response.hits().hits();
+    }
 
+    public List<Hit<Book>> subInfoShouldQuery(String keyword) throws IOException {
+        Query matchPhraseSubInfoText = QueryMaker.matchPhrase(keyword, "subInfoText");
+
+        SearchResponse<Book> response = client.search(s -> s
+                        .index("book")
+                        .query(q -> q
+                                .bool(b -> b
+                                        .must(matchPhraseSubInfoText)
+                                )
+                        )
+                        .size(50),
+                Book.class
+        );
         return response.hits().hits();
     }
 }

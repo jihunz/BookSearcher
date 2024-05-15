@@ -151,7 +151,7 @@ public class BookServiceImpl implements BookService {
         this.titles = new HashMap<>();
         List<Book> result = new ArrayList<>();
 
-        List<Hit<Book>> hit = esService.descMustQuery(keyword);
+        List<Hit<Book>> hit = esService.subInfoShouldQuery(keyword);
         hit.forEach(v -> {
             if (!isTitleDuplicated(v.source().getTitle())) {
                 result.add(new Book(v));
@@ -192,5 +192,22 @@ public class BookServiceImpl implements BookService {
 
         return title && desc;
     }
+
+//    private double calcMatchingPercentage(String str1, String str2) {
+//        // 공백과 특수 문자 제거
+//        String cleanStr1 = str1.replaceAll("[^a-zA-Z0-9]", "");
+//        String cleanStr2 = str2.replaceAll("[^a-zA-Z0-9]", "");
+//
+//        // 두 문자열 중 길이가 더 짧은 문자열의 길이를 기준으로 일치하는 문자 수 계산
+//        int minLength = Math.min(cleanStr1.length(), cleanStr2.length());
+//        int matchingCount = 0;
+//        for (int i = 0; i < minLength; i++) {
+//            if (cleanStr1.charAt(i) == cleanStr2.charAt(i)) {
+//                matchingCount++;
+//            }
+//        }
+//
+//        return (double) matchingCount / minLength * 100;
+//    }
 
 }

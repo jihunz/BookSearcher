@@ -18,4 +18,4 @@ elasticsearch:
   password: 12341234
   idxName: book
   settingMappingPath: backend/src/main/java/com/jihun/booksearcher/elasticSearch/config/settingAndMapping.json
-  bulkSize: 10000
+  bulkSize: 1000
