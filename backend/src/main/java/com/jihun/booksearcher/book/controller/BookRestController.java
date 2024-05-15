@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Map;
 
+import static com.jihun.booksearcher.book.enums.SearchType.DESC;
+import static com.jihun.booksearcher.book.enums.SearchType.SUB_INFO;
+
 
 @RestController
 @RequestMapping("/api/book")
@@ -25,11 +28,12 @@ public class BookRestController {
 
 	@GetMapping("/search")
 	public ResponseEntity<?> search(@RequestParam("type") String type, @RequestParam("keyword") String keyword) throws IOException {
-		SearchType searchType = SearchType.valueOf(type.toUpperCase());
+
+		SearchType searchType = SearchType.findByVal(type);
 
         return switch (searchType) {
-            case DESC -> ResponseEntity.ok(service.searchTitleDesc(keyword));
-            case SUB_INFO -> ResponseEntity.ok(service.searchSubInfo(keyword));
-        };
+			case DESC -> ResponseEntity.ok(service.searchTitleDesc(keyword));
+			case SUB_INFO -> ResponseEntity.ok(service.searchSubInfo(keyword));
+		};
 	}
 }

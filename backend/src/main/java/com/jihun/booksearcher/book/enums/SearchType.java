@@ -10,4 +10,12 @@ public enum SearchType {
     SUB_INFO("subInfo");
 
     private final String value;
+
+    public static SearchType findByVal(String value) {
+        for (SearchType item : SearchType.values()) {
+            if (item.getValue().equals(value)) return item;
+        }
+        return null;
+    }
+
 }
