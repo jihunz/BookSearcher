@@ -1,0 +1,133 @@
+
+.book-each {
+    width: 45%;
+    height: 100%;
+    flex-shrink: 0;
+    border-radius: 4px;
+    background: #FFF;
+    box-shadow: 0px 1px 0px 0px #DDD6CF;
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    margin: 7.5px;
+    max-height: 330px; /* 원하는 최대 높이로 설정 */
+    overflow: hidden;
+}
+
+.book-img {
+    width: 88px;
+    height: 123px;
+    flex-shrink: 0;
+    background: red, lightgray 0px 0px / 100% 100% no-repeat;
+}
+
+.title {
+    color: #302119;
+    font-family: Roboto;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 20px; /* 125% */
+    margin-bottom: 5px;
+}
+
+.author {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #302119;
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+    margin-bottom: 6px;
+}
+
+.publisher {
+    height: 17px;
+    color: #302119;
+    font-family: Roboto;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+    margin-bottom: 12px;
+}
+
+.isbn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #4F546C;
+    font-family: Roboto;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 12px; /* 120% */
+    text-transform: uppercase;
+    width: fit-content;
+    height: 20px;
+    padding: 4px 8px;
+    align-items: center;
+    border-radius: 8px;
+    background: rgba(163, 171, 206, 0.15);
+    margin-right: 10px;
+}
+
+.more-btn {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.desc {
+    width: 100%;
+    color: #302119;
+    font-family: Noto Sans KR;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 20px; /* 133.333% */
+    margin-top: 10px;
+}
+
+.result-text-wr {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 1px;
+}
+
+.result-text-wr p:nth-child(1) {
+    margin-right: 4px;
+}
+
+.book-top {
+    display: flex;
+    flex-direction: row;
+}
+
+.book-top > div {
+    margin-right: 16px;
+}
+
+.book-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.isbn-wr {
+    display: flex;
+    flex-direction: row;
+}
+
+.hide {
+    display: none;
+}
+
