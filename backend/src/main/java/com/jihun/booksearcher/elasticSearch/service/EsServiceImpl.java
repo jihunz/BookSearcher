@@ -64,7 +64,7 @@ public class EsServiceImpl {
     }
 
     public void createIdxAndSettingMapping(String idxName) throws IOException {
-        try (InputStream json = Files.newInputStream(Paths.get(SETTING_MAPPING_PATH))) {
+        try (InputStream json = Files.newInputStream(Paths.get(SETTING_MAPPING_PATH).toAbsolutePath())) {
             CreateIndexRequest req = new CreateIndexRequest.Builder()
                     .index(idxName)
                     .withJson(json)
