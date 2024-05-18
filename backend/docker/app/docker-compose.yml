@@ -1,0 +1,9 @@
+services:
+  app-nginx:
+    container_name: app-nginx
+    build:
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports:
+      - "3001:80"
+    restart: always

@@ -1,5 +1,3 @@
-version: "3.8"
-
 volumes:
   certs:
     driver: local
@@ -214,8 +212,8 @@ services:
       - es01
       - es02
     build:
-      dockerfile: Dockerfile
-      context: ../nginx
+      dockerfile: nginx/Dockerfile
+      context: nginx
     ports:
       - "3333:80"
     restart: always

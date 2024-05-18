@@ -6,10 +6,10 @@ RUN mkdir /home/image
 FROM gradle:7.6.2-jdk17 as builder
 WORKDIR /build
 
-COPY ../build.gradle settings.gradle /build/
+COPY ../../build.gradle settings.gradle /build/
 RUN gradle build -x test --parallel --continue > /dev/null 2>&1 || true
 
-COPY ../.. /build
+COPY ../../.. /build
 RUN gradle clean bootjar -Pprofile=prod
 
 # 2. jar 실행
