@@ -9,7 +9,7 @@ function Book(props) {
         <div className="book-each" onClick={() => {toggleDesc(idx)}}>
             <div className="book-top">
                 <div>
-                    <img className="book-img" src={item.image}/>
+                    <img className="book-img" src={item.img}/>
                 </div>
                 <div className="book-info">
                     <p className="title">{item.title}</p>
