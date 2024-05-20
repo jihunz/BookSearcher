@@ -15,7 +15,7 @@ elasticsearch:
   port: 3333
   protocol: http
 #  apikey: TDZrcC1ZNEJiaGxzbmZRWnduZUo6TGRpald4UVFSd2l2RVpsOEdvRmhSQQ==
-  apikey: N19JOGlZOEJqM253ZXVFYnlubjM6QjFaZVhaZG5UOHVmVGJETGNWT3NoUQ==
+  apikey: ZEVybGxZOEJpUG1nYWpmLWp6djA6N1E4RkpkOTBRV3F1eURGVmQ3VDN3QQ==
   userName: elastic
   password: 12341234
   idxName: book
