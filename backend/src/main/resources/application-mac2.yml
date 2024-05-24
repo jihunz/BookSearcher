@@ -14,9 +14,9 @@ elasticsearch:
   host: localhost
   port: 3333
   protocol: http
-  apikey: ZEVybGxZOEJpUG1nYWpmLWp6djA6N1E4RkpkOTBRV3F1eURGVmQ3VDN3QQ==
+  apikey: TjF6YnFvOEJ3UHV1bWlkWW14TEQ6cnNpRlNNRU5UT1NUQzlBLTlkTklFUQ==
   userName: elastic
   password: 12341234
   idxName: book
-  settingMappingPath: src/main/java/com/jihun/booksearcher/elasticSearch/config/settingAndMapping.json
-  bulkSize: 1000
+  settingMappingPath: /Users/jihunjang/workspace/BookSearcher/backend/src/main/java/com/jihun/booksearcher/elasticSearch/config/settingAndMapping.json
+  bulkSize: 10000
