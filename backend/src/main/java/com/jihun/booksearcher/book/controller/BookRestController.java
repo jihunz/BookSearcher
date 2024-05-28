@@ -28,7 +28,6 @@ public class BookRestController {
 
 	@GetMapping("/search")
 	public ResponseEntity<?> search(@RequestParam("type") String type, @RequestParam("keyword") String keyword) throws IOException {
-
 		SearchType searchType = SearchType.findByVal(type);
 
         return switch (searchType) {
