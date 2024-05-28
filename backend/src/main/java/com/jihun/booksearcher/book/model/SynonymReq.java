@@ -6,6 +6,5 @@ import java.util.List;
 
 @Data
 public class SynonymReq {
-    private String id;
     private String synonyms;
 }

@@ -26,7 +26,7 @@ public class SynonymRestController {
 //    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable String id, @RequestBody List<SynonymReq> request) {
+    public ResponseEntity<?> update(@PathVariable String id, @RequestBody List<String> request) {
         try {
             return ResponseEntity.ok(synonymService.update(id, request));
         } catch (IOException e) {

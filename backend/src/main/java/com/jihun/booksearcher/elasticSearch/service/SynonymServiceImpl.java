@@ -3,7 +3,6 @@ package com.jihun.booksearcher.elasticSearch.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Result;
 import co.elastic.clients.elasticsearch.synonyms.*;
-import com.jihun.booksearcher.book.model.SynonymReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +22,9 @@ public class SynonymServiceImpl {
         return client.synonyms().getSynonym(getRequest);
     }
 
-    public Result update(String id, List<SynonymReq> request) throws IOException {
+    public Result update(String id, List<String> request) throws IOException {
         List<SynonymRule> ruleList = request.stream()
-                .map(v -> SynonymRule.of(r -> r.synonyms(v.getSynonyms())))
+                .map(v -> SynonymRule.of(r -> r.synonyms(v)))
                 .toList();
         PutSynonymRequest putRequest = PutSynonymRequest.of(r -> r
                 .id(id)
