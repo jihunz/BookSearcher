@@ -1,6 +1,5 @@
 package com.jihun.booksearcher.book.controller;
 
-import com.jihun.booksearcher.book.model.SynonymReq;
 import com.jihun.booksearcher.elasticSearch.service.SynonymServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
