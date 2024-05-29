@@ -15,13 +15,6 @@ public class SynonymServiceImpl {
 
     private final ElasticsearchClient client;
 
-    public GetSynonymResponse item(String id) throws IOException {
-        GetSynonymRequest getRequest = GetSynonymRequest.of(r -> r
-                .id(id)
-        );
-        return client.synonyms().getSynonym(getRequest);
-    }
-
     public Result update(String id, List<String> request) throws IOException {
         List<SynonymRule> ruleList = request.stream()
                 .map(v -> SynonymRule.of(r -> r.synonyms(v)))

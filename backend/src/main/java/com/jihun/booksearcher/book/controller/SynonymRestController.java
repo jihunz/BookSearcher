@@ -15,15 +15,6 @@ public class SynonymRestController {
 
     private final SynonymServiceImpl synonymService;
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> item(@PathVariable String id) {
-//        try {
-//            return ResponseEntity.ok(synonymService.item(id));
-//        } catch (IOException e) {
-//            return ResponseEntity.status(500).body(e.getMessage());
-//        }
-//    }
-
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable String id, @RequestBody List<String> request) {
         try {
