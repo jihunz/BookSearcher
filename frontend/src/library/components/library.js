@@ -31,23 +31,35 @@ function LibrarySection(props) {
     );
 }
 
+
 function LibraryMain() {
     const location = useLocation();
-    const map = location.state?.bookStatusMap;
+    const map = location.state?.bookStatusMap || {};
+
+    const isEmpty = Object.keys(map).length === 0;
 
     return (
         <div id="libary-con">
-            <SubNavigation/>
+            <SubNavigation />
             <div className="library-wr">
-                <div className="library-sections">
-                    {Object.keys(map).map((item, index) => (
-                        <LibrarySection
-                            key={index}
-                            bookList={map[item]}
-                            library={item}
-                        />
-                    ))}
-                </div>
+                {isEmpty ? (
+                    <div className="library-sections">
+                        <div id="library-not-found">
+                            <p>해당 도서를 대출할 수 있는 도서관이 없습니다</p>
+                            <a href="/">도서 검색 결과로 돌아가기</a>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="library-sections">
+                        {Object.keys(map).map((item, index) => (
+                            <LibrarySection
+                                key={index}
+                                bookList={map[item]}
+                                library={item}
+                            />
+                        ))}
+                    </div>
+                )}
                 <div className="map">
                     {/*<img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/d179f8c0691a4c1f850be19ed3c08310587ebc34c95c211337dacdf4b84c70f4?apiKey=ba4c8e176d3c4693ade2abd0ee617995&" alt="Library" />*/}
                     {/*<img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/fa144d9e323484fbd2d44b582ce4610321dfd6498fff24a3197e9030b8307860?apiKey=ba4c8e176d3c4693ade2abd0ee617995&" alt="Library" />*/}
