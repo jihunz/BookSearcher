@@ -1,15 +1,38 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import css from '../style/book.css'
-import Library from "../../library/components/library";
-import LibraryMain from "../../library/components/library";
-import {Link} from "react-router-dom";
+import {useNavigate} from 'react-router-dom';
+import axios from "axios";
 
 function Book(props) {
-    const { item, idx, isToggled, toggleDesc} = props;
+    const {item, idx, isToggled, toggleDesc} = props;
+    const [bookStatusMap, setBookStatusMap] = useState(null);
+    const navigate = useNavigate();
+    const prevBookStatusMapRef = useRef();
 
+    async function getBookStatusMap(title) {
+        try {
+            const response = await axios
+                .get(`http://localhost:2024/api/crawler?term=${title}`);
+            setBookStatusMap(response.data);
+        } catch (e) {
+            console.log(e);
+            throw e;
+        }
+    }
+
+    useEffect(() => {
+        // 이전 값과 현재 값이 다를 때만 navigate 실행
+        if (prevBookStatusMapRef.current !== undefined && prevBookStatusMapRef.current !== bookStatusMap) {
+            navigate('/library', { state: { bookStatusMap } });
+        }
+        // 이전 값을 현재 값으로 업데이트
+        prevBookStatusMapRef.current = bookStatusMap;
+    }, [bookStatusMap, navigate]);
 
     return (
-        <div className="book-each" onClick={() => {toggleDesc(idx)}}>
+        <div className="book-each" onClick={() => {
+            toggleDesc(idx)
+        }}>
             <div className="book-top">
                 <div>
                     <img className="book-img" src={item.img}/>
@@ -27,10 +50,9 @@ function Book(props) {
                         </div>
                     </div>
                 </div>
-                <div>
-                    <Link to="/library">도서관 찾기</Link>
-                    {/*<LibraryMain></LibraryMain>*/}
-                </div>
+                <div className="library-link" onClick={() => {
+                    getBookStatusMap(item.title)
+                }}>도서관 찾기</div>
                 <div className="more-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                          viewBox="0 0 16 16"

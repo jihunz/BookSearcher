@@ -1,6 +1,7 @@
 import * as React from "react";
 import '../style/library.css';
 import SubNavigation from "../../common/navigation/subNavigation";
+import {useLocation} from "react-router-dom";
 
 function LibraryCard({title, code, status}) {
     return (
@@ -9,56 +10,43 @@ function LibraryCard({title, code, status}) {
                 <div className="title">{title}</div>
                 <div className="callNum">{code}</div>
             </div>
-            <div className={`checkAvailability ${status === '대출 가능' ? 'available' : 'unavailable'}`}>
+            <div className={`status ${status === '대출가능' ? 'available' : 'unavailable'}`}>
                 {status}
             </div>
         </div>
     );
 }
 
-function LibrarySection({libraryName, books}) {
+function LibrarySection(props) {
+    const {bookList, library} = props;
+    console.log(bookList)
+    let key = Object.keys(library)[0];
     return (
         <section>
-            <h2 className="library-name">{libraryName}</h2>
-            {books.map((book, index) => (
-                <LibraryCard key={index} {...book} />
+            <h2 className="library-name">{library}</h2>
+            {bookList.map((item, index) => (
+                <LibraryCard key={index} {...item} />
             ))}
         </section>
     );
 }
 
 function LibraryMain() {
-    const data = [
-        {
-            libraryName: "갈마도서관",
-            books: [
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 가능"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 가능"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 중"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 중"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 중"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 중"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 가능"}
-            ]
-        },
-        {
-            libraryName: "갈마도서관",
-            books: [
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 가능"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 가능"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 중"},
-                {title: "나쁜 직장, 좋은 직장 그리고 착한 직장 : 분석한 책", code: "810.81 최871ㅁ", status: "대출 가능"}
-            ]
-        }
-    ];
+    const location = useLocation();
+    const map = location.state?.bookStatusMap;
 
     return (
         <div id="libary-con">
             <SubNavigation/>
             <div className="library-wr">
                 <div className="library-sections">
-                    <LibrarySection libraryName={data[0].libraryName} books={data[0].books}/>
-                    <LibrarySection libraryName={data[1].libraryName} books={data[1].books}/>
+                    {Object.keys(map).map((item, index) => (
+                        <LibrarySection
+                            key={index}
+                            bookList={map[item]}
+                            library={item}
+                        />
+                    ))}
                 </div>
                 <div className="map">
                     {/*<img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/d179f8c0691a4c1f850be19ed3c08310587ebc34c95c211337dacdf4b84c70f4?apiKey=ba4c8e176d3c4693ade2abd0ee617995&" alt="Library" />*/}

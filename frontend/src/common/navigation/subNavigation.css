@@ -1,5 +1,6 @@
 :root {
     --sub-navi-height: 34px;
+    --close-height: 26px;
 }
 
 .sn-con {
@@ -21,6 +22,6 @@
     padding: 0 11px 0;
 }
 
-#id {
-
+#close {
+    height: var(--close-height);
 }

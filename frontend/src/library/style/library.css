@@ -12,10 +12,35 @@
 }
 
 .library-sections {
-    display: flex;
-    flex-direction: column;
     width: 500px;
-    margin: 0 16px 0 0;
+    overflow: auto;
+    cursor: grab;
+    padding-right: 16px;
+}
+
+section {
+    margin-bottom: 10px;
+    min-height: 0;
+}
+
+/* WebKit 기반 브라우저 (Chrome, Safari) */
+.library-wr::-webkit-scrollbar {
+    width: 5px;  /* 세로 스크롤 바의 폭 */
+    height: 5px; /* 가로 스크롤 바의 높이 */
+}
+
+.library-wr::-webkit-scrollbar-thumb {
+    background: #888;  /* 스크롤 바의 색상 */
+    border-radius: 10px; /* 스크롤 바의 둥근 모서리 */
+}
+
+.library-wr::-webkit-scrollbar-thumb:hover {
+    background: #555;  /* 마우스 오버 시 스크롤 바의 색상 */
+}
+
+.library-wr::-webkit-scrollbar-track {
+    background: #f1f1f1;  /* 스크롤 트랙의 색상 */
+    border-radius: 10px; /* 스크롤 트랙의 둥근 모서리 */
 }
 
 /*@media (max-width: 991px) {*/
@@ -60,13 +85,6 @@
 /*    }*/
 /*}*/
 
-section {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    margin-bottom: 10px;
-}
-
 /*@media (max-width: 991px) {*/
 /*    section {*/
 /*        margin-top: 40px;*/
@@ -82,7 +100,7 @@ h2.library-name {
     white-space: nowrap;
     justify-content: center;
     padding: 8px 14px;
-    font: 400 14px/157% Inter, sans-serif;
+    font: 700 15px/157% Inter, sans-serif;
 }
 
 /*@media (max-width: 991px) {*/
@@ -127,7 +145,7 @@ h2.library-name {
     margin-top: 10px;
 }
 
-.checkAvailability {
+.status {
     border-radius: 6px;
     align-self: end;
     margin-top: 21px;
@@ -137,17 +155,17 @@ h2.library-name {
     font: 700 12px/182% Noto Sans KR, sans-serif;
 }
 
-.checkAvailability.available {
+.status.available {
     background-color: #87c671;
 }
 
-.checkAvailability.unavailable {
+.status.unavailable {
     background-color: #de6b6a;
     white-space: nowrap;
 }
 
 /*@media (max-width: 991px) {*/
-/*    .checkAvailability.unavailable {*/
+/*    .status.unavailable {*/
 /*        white-space: initial;*/
 /*    }*/
 /*}*/
