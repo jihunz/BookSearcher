@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import css from '../style/searchPage.css';
-import Navigation from "../../common/navigation/Navigation";
+import MainNavigation from "../../common/navigation/mainNavigation";
 import Footer from "../../common/footer/Footer";
 import Book from "./Book";
 import axios from "axios";
@@ -45,7 +45,7 @@ function SearchPage() {
 
     return (
         <div className="container">
-            <Navigation
+            <MainNavigation
                 handleKeyPress={handleKeyPress}
                 navKeyword={navKeyword}
                 setNavKeyword={setNavKeyword}

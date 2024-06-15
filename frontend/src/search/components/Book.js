@@ -1,5 +1,8 @@
 import React, {useState} from 'react';
 import css from '../style/book.css'
+import Library from "../../library/components/library";
+import LibraryMain from "../../library/components/library";
+import {Link} from "react-router-dom";
 
 function Book(props) {
     const { item, idx, isToggled, toggleDesc} = props;
@@ -23,6 +26,10 @@ function Book(props) {
                             <p>KDC: {item.kdc}</p>
                         </div>
                     </div>
+                </div>
+                <div>
+                    <Link to="/library">도서관 찾기</Link>
+                    {/*<LibraryMain></LibraryMain>*/}
                 </div>
                 <div className="more-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"

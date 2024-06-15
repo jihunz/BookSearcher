@@ -1,0 +1,26 @@
+:root {
+    --sub-navi-height: 34px;
+}
+
+.sn-con {
+    width: 100%;
+    background-color: #fbf9f7;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 2px 6px #888888;
+    background: #fff;
+}
+
+.sn-wr {
+    width: 1920px;
+    height: var(--sub-navi-height);
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 11px 0;
+}
+
+#id {
+
+}

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import css from './navigation.css'
+import css from './mainNavigation.css'
 
-function Navigation(props) {
+function MainNavigation(props) {
     const {handleKeyPress, navKeyword, setNavKeyword} = props;
 
     return (
@@ -30,7 +30,7 @@ function Navigation(props) {
                     />
                 </div>
                 <div id="setting">
-                    <a href="/login">
+                    <a href="/">
                         <img
                             id="setting-logo"
                             alt="Vector"
@@ -43,4 +43,4 @@ function Navigation(props) {
     );
 }
 
-export default Navigation
+export default MainNavigation
