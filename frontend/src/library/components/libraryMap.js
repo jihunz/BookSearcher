@@ -1,13 +1,18 @@
 import * as React from "react";
 import '../style/libraryMap.css';
 import {useEffect} from "react";
-import createMap from "../util/kakaoMapConfig";
+import createMap from "../util/kakaoMapManager";
+import KakaoMapManager from "../util/kakaoMapManager";
 
 
 function LibraryMap(props) {
+    const {libraryMap} = props;
+    const kakaoMapConfig = new KakaoMapManager();
 
     useEffect(() => {
-        createMap();
+        kakaoMapConfig.loadMap();
+        const libraryList = Object.keys(libraryMap);
+        kakaoMapConfig.execPlacesSearch(libraryList);
     }, []);
 
     return (

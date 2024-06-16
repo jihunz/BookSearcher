@@ -1,6 +1,5 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client'; // Import from "react-dom/client" instead of "react-dom"
-// import reportWebVitals from './reportWebVitals';
+import { createRoot } from 'react-dom/client';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SearchPage from "./search/components/SearchPage";
@@ -11,13 +10,9 @@ const root = createRoot(rootElement);
 
 root.render(
   <Router>
-    <React.StrictMode>
       <Routes>
         <Route path="/" element={<SearchPage />} />
         <Route path="/library" element={<LibraryMain />} />
       </Routes>
-    </React.StrictMode>
   </Router>
 );
-
-// reportWebVitals();

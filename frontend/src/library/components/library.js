@@ -23,7 +23,7 @@ function LibrarySection(props) {
     let key = Object.keys(library)[0];
     return (
         <section>
-            <h2 className="library-name">{library}</h2>
+            <h2 className={`library-name ${library}`}>{library}</h2>
             {bookList.map((item, index) => (
                 <LibraryCard key={index} {...item} />
             ))}
@@ -59,7 +59,9 @@ function LibraryMain() {
                         ))}
                     </div>
                 )}
-                <LibraryMap/>
+                <LibraryMap
+                    libraryMap={map}
+                />
             </div>
         </div>
     );
