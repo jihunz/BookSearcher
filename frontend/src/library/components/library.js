@@ -1,10 +1,11 @@
-import * as React from "react";
+import React, { useEffect, useRef } from "react";
 import '../style/library.css';
 import SubNavigation from "../../common/navigation/subNavigation";
-import {useLocation} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import LibraryMap from "./libraryMap";
+import KakaoMapManager from "../util/kakaoMapManager";
 
-function LibraryCard({title, code, status}) {
+function LibraryCard({ title, code, status }) {
     return (
         <div className="card">
             <div className="card-content">
@@ -19,10 +20,12 @@ function LibraryCard({title, code, status}) {
 }
 
 function LibrarySection(props) {
-    const {bookList, library} = props;
-    let key = Object.keys(library)[0];
+    const { bookList, library, onSectionMouseOver } = props;
+
     return (
-        <section>
+        <section
+            onMouseOver={() => onSectionMouseOver(library)}
+        >
             <h2 className={`library-name ${library}`}>{library}</h2>
             {bookList.map((item, index) => (
                 <LibraryCard key={index} {...item} />
@@ -34,6 +37,21 @@ function LibrarySection(props) {
 function LibraryMain() {
     const location = useLocation();
     const map = location.state?.bookStatusMap || {};
+    const kakaoMapRef = useRef(null);
+
+    useEffect(() => {
+        kakaoMapRef.current = new KakaoMapManager();
+        kakaoMapRef.current.loadMap();
+        // 예시: 도서관 이름 목록
+        const libraries = Object.keys(map);
+        kakaoMapRef.current.execPlacesSearch(libraries);
+    }, [map]);
+
+    const handleSectionMouseOver = (library) => {
+        if (kakaoMapRef.current) {
+            kakaoMapRef.current.openInfoWindow(library);
+        }
+    };
 
     const isEmpty = Object.keys(map).length === 0;
 
@@ -55,13 +73,12 @@ function LibraryMain() {
                                 key={index}
                                 bookList={map[item]}
                                 library={item}
+                                onSectionMouseOver={handleSectionMouseOver}
                             />
                         ))}
                     </div>
                 )}
-                <LibraryMap
-                    libraryMap={map}
-                />
+                <LibraryMap libraryMap={map} />
             </div>
         </div>
     );
