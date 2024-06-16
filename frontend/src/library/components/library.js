@@ -2,7 +2,7 @@ import * as React from "react";
 import '../style/library.css';
 import SubNavigation from "../../common/navigation/subNavigation";
 import {useLocation} from "react-router-dom";
-import KakaoMap from "./kakaoMap";
+import LibraryMap from "./libraryMap";
 
 function LibraryCard({title, code, status}) {
     return (
@@ -59,7 +59,7 @@ function LibraryMain() {
                         ))}
                     </div>
                 )}
-                <KakaoMap/>
+                <LibraryMap/>
             </div>
         </div>
     );
