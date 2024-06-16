@@ -2,6 +2,7 @@ import * as React from "react";
 import '../style/library.css';
 import SubNavigation from "../../common/navigation/subNavigation";
 import {useLocation} from "react-router-dom";
+import KakaoMap from "./kakaoMap";
 
 function LibraryCard({title, code, status}) {
     return (
@@ -19,7 +20,6 @@ function LibraryCard({title, code, status}) {
 
 function LibrarySection(props) {
     const {bookList, library} = props;
-    console.log(bookList)
     let key = Object.keys(library)[0];
     return (
         <section>
@@ -30,7 +30,6 @@ function LibrarySection(props) {
         </section>
     );
 }
-
 
 function LibraryMain() {
     const location = useLocation();
@@ -60,10 +59,7 @@ function LibraryMain() {
                         ))}
                     </div>
                 )}
-                <div className="map">
-                    {/*<img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/d179f8c0691a4c1f850be19ed3c08310587ebc34c95c211337dacdf4b84c70f4?apiKey=ba4c8e176d3c4693ade2abd0ee617995&" alt="Library" />*/}
-                    {/*<img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/fa144d9e323484fbd2d44b582ce4610321dfd6498fff24a3197e9030b8307860?apiKey=ba4c8e176d3c4693ade2abd0ee617995&" alt="Library" />*/}
-                </div>
+                <KakaoMap/>
             </div>
         </div>
     );

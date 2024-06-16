@@ -170,10 +170,6 @@ h2.library-name {
 /*    }*/
 /*}*/
 
-.map {
-    background: black;
-}
-
 #library-not-found {
     display: flex;
     flex-direction: column;
