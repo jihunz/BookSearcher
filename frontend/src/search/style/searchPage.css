@@ -19,7 +19,7 @@ html, body {
     /*margin-bottom: 343px;*/
 }
 
-.compass {
+.lighthouse {
     width: 60px;
     height: 60px;
     flex-shrink: 0;
@@ -38,7 +38,7 @@ html, body {
     margin-bottom: 10px;
 }
 
-.compass-wr {
+.lighthouse-wr {
     display: flex;
     align-items: center;
     margin-right: 12px;
@@ -60,6 +60,7 @@ html, body {
     font-style: normal;
     font-weight: 400;
     line-height: 36px; /* 150% */
+    text-align: center;
 }
 
 .search-con-main {

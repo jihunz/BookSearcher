@@ -4,6 +4,7 @@ import MainNavigation from "../../common/navigation/mainNavigation";
 import Footer from "../../common/footer/Footer";
 import Book from "./Book";
 import axios from "axios";
+import lighthouse from '../../static/img/lighthouse.png'
 
 function SearchPage() {
     const [result, setResult] = useState([]);
@@ -54,16 +55,16 @@ function SearchPage() {
                     <div className="intro-con">
                         <div className="intro-text1-con">
                             <div className="intro-text1-wr">
-                                <div className="compass-wr">
+                                <div className="lighthouse-wr">
                                     <img
-                                        className="compass"
-                                        alt="compass"
-                                        src="https://cdn.animaapp.com/projects/6554b898d013fc74e5940117/releases/6554b8c9411b2c1ade9b7f0b/img/frame-1.svg"
+                                        className="lighthouse"
+                                        alt="lighthouse"
+                                        src={lighthouse}
                                     />
                                 </div>
-                                <div><h3 className="intro-text1">Discover</h3></div>
+                                <div><h3 className="intro-text1">추상적 호기심을 구체적 지식으로</h3></div>
                             </div>
-                            <div><p className="intro-text2">궁금한 내용, 제목, 저자 등을 검색해보세요!</p></div>
+                            <div><p className="intro-text2">궁금한 내용이나 제목, 저자, 출판사를 검색해보세요</p></div>
                         </div>
                     </div>
                     <div className="search-con-main">
