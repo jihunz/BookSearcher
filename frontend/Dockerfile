@@ -1,7 +1,8 @@
-FROM node:16-alpine3.11
+FROM node:16-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --force
+RUN npm ci --only=production
 COPY . .
+
+RUN npm run build
 CMD [ "npm", "start" ]
-EXPOSE 3000

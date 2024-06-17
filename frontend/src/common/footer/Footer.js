@@ -43,8 +43,8 @@ function Footer() {
                     </div>
                 </div>
                 <div className="f-bottom">
-                    <p>© 2023 장지훈(github.com/jihunz), 이태성(github.com/treesap1127). 해당 사이트의 모든 요소에 대한
-                        저작권은 이 둘에게 있으며 무단 도용과 상업적 사용을 절대 금지합니다.</p>
+                    <p>© 2024 장지훈(github.com/jihunz). 해당 사이트의 모든 요소에 대한
+                        저작권은 장지훈에게 있으며 무단 도용과 상업적 사용을 절대 금지합니다.</p>
                 </div>
             </div>
         </footer>

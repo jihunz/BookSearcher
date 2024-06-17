@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import css from '../style/searchPage.css';
 import MainNavigation from "../../common/navigation/mainNavigation";
 import Footer from "../../common/footer/Footer";
@@ -10,6 +10,8 @@ function SearchPage() {
     const [mainKeyword, setMainKeyword] = useState("");
     const [navKeyword, setNavKeyword] = useState("");
     const [clickedBook, setClickedBook] = useState(-1);
+    const [searchType, setSearchType] = useState("desc");
+
     const toggleDesc = (index) => {
         setClickedBook(index);
     };
@@ -34,7 +36,7 @@ function SearchPage() {
     }
 
     function handleKeyPress(e, keyword, searchType) {
-        if (e.key === 'Enter') search('desc', keyword);
+        if (e.key === 'Enter') search(searchType, keyword);
 
         if (searchType === 'main') {
             setNavKeyword('');
@@ -68,6 +70,20 @@ function SearchPage() {
                         </div>
                     </div>
                     <div className="search-con-main">
+                        <div className="search-options">
+                            <button
+                                className={`search-option-btn ${searchType === 'desc' ? 'active' : ''}`}
+                                onClick={() => setSearchType('desc')}
+                            >
+                                소개글
+                            </button>
+                            <button
+                                className={`search-option-btn ${searchType === 'subInfo' ? 'active' : ''}`}
+                                onClick={() => setSearchType('subInfo')}
+                            >
+                                저자, 출판사
+                            </button>
+                        </div>
                         <div className="search-icon-main-wr">
                             <img
                                 className="search-icon-main"
@@ -79,10 +95,10 @@ function SearchPage() {
                             placeholder={"Search"}
                             value={mainKeyword}
                             onChange={(e) => setMainKeyword(e.target.value)}
-                            onKeyDown={e => handleKeyPress(e, mainKeyword, 'main')}
+                            onKeyDown={e => handleKeyPress(e, mainKeyword, searchType)}
                         />
                         <div>
-                            <button className="search-main-btn" onClick={e => search('desc', mainKeyword)}>검색</button>
+                            <button className="search-main-btn" onClick={() => search(searchType, mainKeyword)}>검색</button>
                             <svg className="search-main-arrow" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                  viewBox="0 0 24 24" fill="none">
                                 <path
@@ -90,7 +106,6 @@ function SearchPage() {
                                     fill="white"/>
                             </svg>
                         </div>
-
                     </div>
                     <div className="result-con">
                         <div className="result-text-wr">
