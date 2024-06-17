@@ -35,13 +35,10 @@ function SearchPage() {
         }
     }
 
-    function handleKeyPress(e, keyword, searchType) {
-        if (e.key === 'Enter') search(searchType, keyword);
-
-        if (searchType === 'main') {
-            setNavKeyword('');
-        } else if (searchType === 'nav') {
-            setMainKeyword('');
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            search(searchType, mainKeyword);
         }
     }
 
@@ -95,7 +92,7 @@ function SearchPage() {
                             placeholder={"Search"}
                             value={mainKeyword}
                             onChange={(e) => setMainKeyword(e.target.value)}
-                            onKeyDown={e => handleKeyPress(e, mainKeyword, searchType)}
+                            onKeyDown={handleKeyPress}
                         />
                         <div>
                             <button className="search-main-btn" onClick={() => search(searchType, mainKeyword)}>검색</button>
